@@ -1,0 +1,1242 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NSN Báo giá V1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap">
+<style>
+/* Layout: bản vẽ kỹ thuật gọn — cột đơn 1080px, thanh mục lục dính, mỗi phần là một "bản" có nhãn mục; bản demo là khối thao tác chính */
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --sunk:#E9EDF2; --ink:#13233A; --muted:#5A6A7F; --line:#D6DDE6;
+  --accent:#C26F12; --accent-soft:#FBEAD3; --blue:#1F4E8C; --blue-soft:#E2EBF6;
+  --ok:#1C7A4B; --ok-soft:#DAF0E3; --warn:#9A5B00; --warn-soft:#FFF0D2; --bad:#B0281F; --bad-soft:#FBE2DF;
+  --f-display:"Lexend","Be Vietnam Pro",system-ui,sans-serif;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:10px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1520; --surface:#142030; --sunk:#0F1926; --ink:#E4EBF4; --muted:#93A3B8; --line:#26374C;
+  --accent:#EB9C3E; --accent-soft:#3A2A14; --blue:#86B4F0; --blue-soft:#182C46;
+  --ok:#5BC88E; --ok-soft:#14301F; --warn:#F0B455; --warn-soft:#33260E; --bad:#F2887F; --bad-soft:#3B1A17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1520; --surface:#142030; --sunk:#0F1926; --ink:#E4EBF4; --muted:#93A3B8; --line:#26374C;
+  --accent:#EB9C3E; --accent-soft:#3A2A14; --blue:#86B4F0; --blue-soft:#182C46;
+  --ok:#5BC88E; --ok-soft:#14301F; --warn:#F0B455; --warn-soft:#33260E; --bad:#F2887F; --bad-soft:#3B1A17; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+h2{font-size:1.5rem;font-weight:600}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* nav */
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
+nav.top a{flex:none;padding:6px 12px;border-radius:999px;color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:500;white-space:nowrap}
+nav.top a:hover{background:var(--sunk);color:var(--ink)}
+nav.top a.demo-link{color:var(--accent);font-weight:600}
+
+/* hero */
+header.hero{padding-block:40px 28px}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero h1{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:700;margin-top:8px;max-width:22ch}
+.hero .meta{margin-top:10px;color:var(--muted);font-size:.92rem}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:24px}
+.kpi{background:var(--surface);padding:14px 16px}
+.kpi b{display:block;font-family:var(--f-display);font-size:1.45rem;font-weight:600;font-variant-numeric:tabular-nums}
+.kpi span{font-size:.8rem;color:var(--muted)}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi:last-child{grid-column:span 2}}
+
+/* sections */
+section.sec{padding-block:36px;border-top:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.sec-no{font-family:var(--f-display);font-size:.8rem;color:var(--accent);font-weight:600;letter-spacing:.06em}
+.sec-head p{flex-basis:100%;color:var(--muted);font-size:.92rem}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.clean li{display:flex;gap:10px;align-items:flex-start}
+.ic{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:700;margin-top:2px}
+.ic.x{background:var(--bad-soft);color:var(--bad)}
+.ic.v{background:var(--ok-soft);color:var(--ok)}
+.ic.a{background:var(--accent-soft);color:var(--accent)}
+
+/* before after */
+.ba h3{margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.blue{background:var(--blue-soft);color:var(--blue)}
+.tag.acc{background:var(--accent-soft);color:var(--accent)}
+.tag.grey{background:var(--sunk);color:var(--muted)}
+
+/* poc */
+.poc{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:860px){.poc{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.poc{grid-template-columns:1fr}}
+.poc .panel{padding:16px}
+.poc .chk{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.95rem}
+.poc p{font-size:.86rem;margin-top:6px}
+.poc .next{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:.8rem;color:var(--muted)}
+.poc .next b{color:var(--blue);font-weight:600}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0 12px}
+.tab{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.fb{display:grid;gap:8px}
+.fb .row{display:grid;grid-template-columns:1fr 24px 1fr;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.88rem}
+.fb .arrow{color:var(--accent);text-align:center;font-weight:700}
+@media (max-width:600px){.fb .row{grid-template-columns:1fr}.fb .arrow{text-align:left;transform:rotate(90deg);width:16px}}
+
+/* flow */
+.flow{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.flow-track{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:6px}
+.node{flex:1 0 108px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:0;padding:4px 2px;position:relative}
+.node .dot{width:46px;height:46px;border-radius:12px;border:2px solid var(--line);background:var(--sunk);display:grid;place-items:center;font-family:var(--f-display);font-weight:600;font-size:.8rem;color:var(--muted);transition:all .3s}
+.node .lbl{font-size:.8rem;font-weight:600;text-align:center;line-height:1.25;color:var(--muted)}
+.node .fc{font-size:.68rem;color:var(--muted)}
+.node::after{content:"";position:absolute;top:27px;left:calc(50% + 26px);right:calc(-50% + 26px);height:2px;background:var(--line)}
+.node:last-child::after{display:none}
+.node.done .dot{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+.node.done::after{background:var(--blue)}
+.node.on .dot{border-color:var(--accent);background:var(--accent);color:#fff;transform:scale(1.08)}
+.node.on .lbl{color:var(--ink)}
+.flow-detail{margin-top:14px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--sunk);border-radius:8px;padding:12px 14px;font-size:.9rem}
+.flow-detail .fcode{font-family:var(--f-display);font-weight:600;color:var(--accent)}
+@media (max-width:600px){.flow-detail{grid-template-columns:1fr}}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:.85rem;font-weight:600;white-space:nowrap}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover:not(:disabled){filter:brightness(1.07);border-color:var(--accent)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.bad{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:4px 10px;font-size:.78rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.shared{margin-top:10px;font-size:.82rem;color:var(--muted)}
+
+/* demo */
+#demo{background:var(--sunk)}
+.demo-shell{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 8px 30px -18px rgba(10,30,60,.35)}
+.appbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;background:var(--ink);color:var(--bg)}
+.appbar b{font-family:var(--f-display);font-weight:600}
+.appbar small{opacity:.75}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.strip > div{padding:10px 18px;border-right:1px solid var(--line);min-width:0}
+.strip > div:last-child{border-right:0}
+.strip span{display:block;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.strip b{font-family:var(--f-display);font-weight:600;font-size:1.05rem;font-variant-numeric:tabular-nums}
+@media (max-width:700px){.strip{grid-template-columns:1fr 1fr}.strip>div:nth-child(2){border-right:0}.strip>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+.steps{display:flex;border-bottom:1px solid var(--line);overflow-x:auto}
+.step{flex:1 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:12px 16px;cursor:pointer;text-align:left;color:var(--muted);font-size:.86rem;font-weight:500}
+.step b{display:block;font-family:var(--f-display);font-size:.72rem;letter-spacing:.06em;color:var(--muted)}
+.step[aria-selected="true"]{border-bottom-color:var(--accent);color:var(--ink)}
+.step[aria-selected="true"] b{color:var(--accent)}
+.pane{padding:18px}
+.pane-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.pane-head p{font-size:.86rem;color:var(--muted);max-width:60ch}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.8rem;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);font-weight:600}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.84rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--sunk);font-weight:600;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+td.r,th.r{text-align:right}
+tr.sec-row td{background:var(--blue-soft);color:var(--blue);font-weight:600;font-size:.8rem}
+tr.new td{animation:flash 1.6s ease}
+@keyframes flash{from{background:var(--accent-soft)}to{background:transparent}}
+tbody tr:last-child td{border-bottom:0}
+tfoot td{background:var(--sunk);font-weight:700;border-top:2px solid var(--line);border-bottom:0}
+.note{font-size:.8rem;color:var(--muted);margin-top:10px}
+.note b{color:var(--ink)}
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media (max-width:860px){.rules{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.rules{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px;background:var(--sunk);border-radius:8px;padding:10px 12px;min-width:0}
+.field label{font-size:.74rem;color:var(--muted);font-weight:500}
+.field input,.field select{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 8px;width:100%;font-variant-numeric:tabular-nums}
+.disc{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;font-size:.84rem}
+.disc select,.disc input{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 8px}
+.disc input{width:70px}
+.dchip{display:inline-flex;align-items:center;gap:6px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:3px 6px 3px 10px;font-size:.78rem;font-weight:600}
+.dchip button{border:0;background:none;color:inherit;cursor:pointer;font-weight:700;padding:0 4px}
+.sum-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+@media (max-width:760px){.sum-grid{grid-template-columns:1fr}}
+.sumtbl td{white-space:normal}
+.sumtbl td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.grand td{font-size:1rem;font-family:var(--f-display)}
+.appr{display:flex;flex-direction:column;gap:12px}
+.status-big{display:flex;align-items:center;gap:10px;font-size:.9rem}
+.log{list-style:none;margin:0;padding:0;font-size:.8rem;color:var(--muted);display:grid;gap:4px;max-height:140px;overflow:auto}
+.log li{display:flex;gap:8px}
+.log time{font-variant-numeric:tabular-nums;color:var(--ink);opacity:.7}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:.88rem;opacity:0;pointer-events:none;transition:all .25s;z-index:50;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.demo-note{margin-top:12px;font-size:.8rem;color:var(--muted)}
+
+/* scope cards */
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:860px){.fgrid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.fgrid{grid-template-columns:1fr}}
+.fcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-width:0}
+.fcard:hover{border-color:var(--blue)}
+.fcard .fh{display:flex;justify-content:space-between;align-items:center}
+.fcard .fid{font-family:var(--f-display);font-weight:700;color:var(--blue);font-size:1.1rem}
+.fcard h3{font-size:.98rem}
+.fcard .sum{font-size:.84rem;color:var(--muted)}
+.fcard .more{display:none;font-size:.84rem;border-top:1px dashed var(--line);padding-top:8px}
+.fcard[aria-expanded="true"]{border-color:var(--blue)}
+.fcard[aria-expanded="true"] .more{display:block}
+.fcard .more ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.fcard .acc{margin-top:8px;font-size:.8rem;color:var(--ok)}
+.fcard .hint{font-size:.74rem;color:var(--muted)}
+
+/* architecture */
+.arch{display:grid;gap:6px}
+.layer{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+.layer b{font-family:var(--f-display);font-weight:600;font-size:.92rem}
+.layer small{display:block;color:var(--muted);font-size:.74rem}
+.layer p{font-size:.86rem}
+.layer:nth-child(1){border-left:4px solid var(--blue)}
+.layer:nth-child(2){border-left:4px solid var(--accent)}
+.layer:nth-child(3){border-left:4px solid var(--ok)}
+.layer:nth-child(4){border-left:4px solid var(--muted)}
+.layer:nth-child(5){border-left:4px solid var(--warn)}
+@media (max-width:600px){.layer{grid-template-columns:1fr;gap:4px}}
+.principle{margin-top:12px;font-size:.88rem;background:var(--blue-soft);color:var(--blue);border-radius:8px;padding:10px 14px}
+
+/* cost */
+.paybar{display:flex;height:46px;border-radius:8px;overflow:hidden;margin:6px 0 10px}
+.paybar div{display:grid;place-items:center;color:#fff;font-size:.78rem;font-weight:600;min-width:0;cursor:default;transition:filter .2s}
+.paybar div:hover{filter:brightness(1.1)}
+.paylegend{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;font-size:.78rem}
+.paylegend div{min-width:0}
+.paylegend b{display:block;font-variant-numeric:tabular-nums;font-size:.85rem}
+@media (max-width:700px){.paylegend{grid-template-columns:repeat(3,1fr)}}
+.terms{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+@media (max-width:860px){.terms{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.terms{grid-template-columns:1fr}}
+.terms .panel{padding:14px}
+.terms h3{font-size:.9rem;margin-bottom:4px}
+.terms p{font-size:.82rem;color:var(--muted)}
+
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative}
+.tl .m{padding:0 14px 0 0;min-width:0}
+.tl .bar{height:8px;border-radius:4px;margin-bottom:12px}
+.tl .m:nth-child(1) .bar{background:var(--blue)}
+.tl .m:nth-child(2) .bar{background:var(--accent)}
+.tl .m:nth-child(3) .bar{background:var(--ok)}
+.tl h3{font-size:.95rem}
+.tl .when{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.tl .fs{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}
+.tl ul{margin:0;padding-left:18px;font-size:.84rem;color:var(--muted);display:grid;gap:2px}
+@media (max-width:700px){.tl{grid-template-columns:1fr;gap:20px}}
+
+.confirm .panel h3{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.confirm p{font-size:.86rem}
+.oos{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.oos span{background:var(--sunk);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.8rem;color:var(--muted)}
+footer{padding-block:28px 40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line)}
+/* 3D stage: một "studio" tối cố định ở cả hai theme để khối 3D nổi rõ */
+.stage3d{position:relative;height:clamp(380px,56vw,540px);border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 25%,#1C2E47 0%,#0B1420 72%);cursor:grab;touch-action:pan-y;user-select:none}
+.stage3d.drag{cursor:grabbing}
+.stage3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.labels3d{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lb3d{position:absolute;left:0;top:0;font-size:.72rem;font-weight:500;color:#E8EEF6;background:rgba(9,18,31,.78);border:1px solid rgba(255,255,255,.16);padding:2px 8px;border-radius:6px;white-space:nowrap;opacity:0;transition:opacity .35s;will-change:transform}
+.lb3d.warn{color:#FFC2BB;border-color:rgba(240,110,100,.55)}
+.lb3d.ok{color:#B8F0D2;border-color:rgba(90,200,140,.55)}
+.lb3d.big{font-size:.8rem;font-weight:600}
+.cap3d{position:absolute;left:0;right:0;bottom:0;padding:40px 20px 18px;background:linear-gradient(transparent,rgba(8,15,26,.92));color:#E8EEF6;pointer-events:none}
+.cap3d span{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#EB9C3E;font-weight:600}
+.cap3d b{display:block;font-family:var(--f-display);font-size:1.12rem;font-weight:600;margin-top:2px}
+.cap3d p{font-size:.86rem;color:#B9C6D6;max-width:62ch;margin-top:2px}
+.hud3d{position:absolute;top:14px;right:14px;background:rgba(9,18,31,.8);border:1px solid rgba(90,200,140,.5);color:#B8F0D2;font-size:.78rem;padding:6px 12px;border-radius:8px}
+.hud3d b{font-family:var(--f-display);font-size:1rem;margin-left:6px;color:#fff;font-variant-numeric:tabular-nums}
+.fallback3d{position:absolute;inset:0;display:grid;place-items:center;color:#B9C6D6;font-size:.9rem;padding:20px;text-align:center}
+.prog3d{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.08)}
+.prog3d i{display:block;height:100%;width:0;background:#EB9C3E}
+@media (max-width:600px){.stage3d{height:500px}.lb3d{font-size:.64rem;padding:1px 6px}.cap3d{padding:30px 16px 14px}.cap3d b{font-size:1rem}.cap3d p{font-size:.8rem}}
+.ctl3d{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+
+/* ===== bổ sung v1.2 đầy đủ ===== */
+.docsum{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.docsum div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.82rem;color:var(--muted);display:flex;gap:8px}
+.docsum div b{color:var(--accent);font-family:var(--f-display);font-weight:600;flex:none}
+@media (max-width:760px){.docsum{grid-template-columns:1fr}}
+.sub{font-size:1rem;font-weight:600;margin:26px 0 12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--f-display)}
+.sub .tag{white-space:normal;font-family:var(--f-body)}
+.sub .sn{font-size:.75rem;color:var(--muted);font-weight:600}
+.goals{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media (max-width:900px){.goals{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.goals{grid-template-columns:1fr}}
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;font-size:.86rem;display:flex;flex-direction:column;gap:6px}
+.goal i{font-style:normal;font-family:var(--f-display);font-weight:700;color:var(--accent);font-size:.8rem}
+.cx{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media (max-width:700px){.cx{grid-template-columns:1fr}}
+.cx li{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.86rem}
+.flowline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.82rem;margin-top:12px}
+.flowline span{background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:3px 9px;font-weight:600}
+.flowline em{font-style:normal;color:var(--muted)}
+.callout{border-radius:8px;padding:12px 14px;font-size:.88rem;margin-top:14px;border:1px solid var(--line);background:var(--surface)}
+.callout.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.callout.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.callout.blue{background:var(--blue-soft);border-color:transparent;color:var(--blue)}
+.callout b{font-weight:700}
+.formula{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.formula .fx{font-family:var(--f-display);font-weight:700;color:var(--ink)}
+.formula .op{color:var(--accent);font-weight:700}
+.formula .term{background:var(--sunk);border-radius:6px;padding:4px 10px;font-size:.84rem}
+.dtbl td{white-space:normal;vertical-align:top}
+.dtbl td:first-child{font-weight:600}
+.wide td{white-space:normal;vertical-align:top}
+.fcard .more h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 4px}
+.fcard .more h4:first-child{margin-top:0}
+.fcard .deliv{margin-top:8px;font-size:.8rem;color:var(--blue)}
+.fstatus{margin-top:6px;background:var(--sunk);border-radius:6px;padding:8px 10px;font-size:.8rem}
+.expand-all{margin-bottom:12px}
+.ops{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:860px){.ops{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.ops{grid-template-columns:1fr}}
+.ops .panel{padding:14px}
+.ops h3{font-size:.9rem;margin-bottom:6px}
+.ops ul{margin:0;padding-left:16px;font-size:.82rem;color:var(--muted);display:grid;gap:2px}
+.tlayers{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.uatflow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:.76rem;margin-top:6px}
+.uatflow span{background:var(--sunk);border:1px solid var(--line);border-radius:5px;padding:2px 7px}
+.uatflow em{font-style:normal;color:var(--accent);font-weight:700}
+.cmp{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.cmp div{background:var(--surface);padding:12px 14px}
+.cmp span{display:block;font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.cmp b{font-family:var(--f-display);font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums}
+.cmp small{display:block;font-size:.78rem;color:var(--muted)}
+.cmp .up b{color:var(--accent)}
+@media (max-width:600px){.cmp{grid-template-columns:1fr}}
+.terms2{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+@media (max-width:860px){.terms2{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.terms2{grid-template-columns:1fr}.terms2 .panel{grid-column:auto!important}}
+.terms2 .panel{padding:14px}
+.terms2 h3{font-size:.92rem;margin-bottom:6px;display:flex;gap:6px;align-items:center}
+.terms2 p,.terms2 li{font-size:.83rem;color:var(--muted)}
+.terms2 ul,.terms2 ol{margin:6px 0 0;padding-left:18px;display:grid;gap:3px}
+.terms2 .excl{margin-top:8px;font-size:.78rem;color:var(--bad)}
+.lockl{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:lk}
+.lockl li{display:grid;grid-template-columns:28px 1fr;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.86rem;align-items:start}
+.lockl li::before{counter-increment:lk;content:counter(lk);width:24px;height:24px;border-radius:6px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:.78rem}
+.oosl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:600px){.oosl{grid-template-columns:1fr}}
+.oosl div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:.84rem;display:flex;gap:8px;align-items:flex-start}
+.ver{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.ver li{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--sunk);border-radius:6px;padding:6px 10px;font-size:.8rem}
+.ver li b{font-family:var(--f-display)}
+.ver li.cur{outline:1px solid var(--ok)}
+.ver-h{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+@media print{nav.top,.stage3d,.ctl3d,#hanh-trinh-3d,#demo,.toast{display:none!important}.fcard .more{display:block!important}.fcard .hint{display:none}section.sec{break-inside:avoid-page}}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Mục lục">
+  <div class="wrap">
+    <a href="#hanh-trinh-3d" class="demo-link">◆ 3D</a>
+    <a href="#muc-tieu">Mục tiêu</a>
+    <a href="#boi-canh">Bối cảnh</a>
+    <a href="#poc">Kết quả PoC</a>
+    <a href="#nhu-cau">Nhu cầu tổng thể</a>
+    <a href="#luong">Luồng V1</a>
+    <a href="#demo" class="demo-link">▶ Demo</a>
+    <a href="#pham-vi">Phạm vi F01–F06</a>
+    <a href="#kien-truc">Kiến trúc</a>
+    <a href="#chi-phi">Chi phí & nghiệm thu</a>
+    <a href="#dieu-khoan">Điều khoản</a>
+    <a href="#ke-hoach">Kế hoạch</a>
+    <a href="#xac-nhan">Cần xác nhận</a>
+    <a href="#ban-giao">Bàn giao</a>
+  </div>
+</nav>
+
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">Đề xuất giải pháp · v1.2</div>
+  <h1>Hệ thống Quản lý & Lập Báo giá tập trung</h1>
+  <p class="meta">Khách hàng: CTCP Xây dựng và Công nghiệp NSN · Triển khai: Tiến Nguyễn · Nền tảng: Microsoft Power Platform · Cập nhật sau buổi rà soát 28/09/2026</p>
+  <div class="kpis">
+    <div class="kpi"><b>06</b><span>nhóm chức năng F01–F06</span></div>
+    <div class="kpi"><b>~50</b><span>người dùng</span></div>
+    <div class="kpi"><b>2–3 nghìn</b><span>dòng / Gói công việc</span></div>
+    <div class="kpi"><b>~3 th + 1 tuần</b><span>thời gian triển khai</span></div>
+    <div class="kpi"><b>265 tr</b><span>VNĐ · 209 ngày công</span></div>
+  </div>
+  <div class="docsum" aria-label="Tài liệu này tổng hợp">
+    <div><b>①</b>Bối cảnh, hiện trạng và nhu cầu nghiệp vụ tổng thể của NSN</div>
+    <div><b>②</b>Kết quả POC, phản hồi dùng thử và quyết định sau buổi rà soát 28/09/2026</div>
+    <div><b>③</b>Phạm vi 06 nhóm chức năng F01–F06: Ánh xạ PRICE, SOW/Danh mục vật tư, Phê duyệt, hoàn thiện vận hành</div>
+    <div><b>④</b>Kiến trúc giải pháp trên Microsoft Power Platform</div>
+    <div><b>⑤</b>Mô hình nghiệm thu, thanh toán theo mốc, phát sinh dự kiến & rủi ro gây chậm triển khai</div>
+    <div><b>⑥</b>Kế hoạch ~03 tháng + 01 tuần, rủi ro và nội dung cần xác nhận ở thiết kế chi tiết</div>
+  </div>
+</header>
+</div>
+
+<!-- 3D -->
+<section class="sec" id="hanh-trinh-3d"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>Hành trình dữ liệu báo giá</h2><p>Hoạt họa 3D, 3 cảnh: từ file Excel rời rạc đến báo giá được duyệt. Kéo ngang để xoay góc nhìn.</p></div>
+  <div class="stage3d" id="stage3d">
+    <canvas id="c3d" aria-label="Hoạt họa 3D hành trình dữ liệu báo giá"></canvas>
+    <div class="labels3d" id="labels3d" aria-hidden="true"></div>
+    <div class="cap3d"><span id="capNo">Cảnh 1/3</span><b id="capTitle">Hiện tại: báo giá nằm trên nhiều file Excel</b><p id="capText">PRICE, THKL, NET, Tổng hợp rời rạc. Đồng bộ bằng tay, khó truy vết, dễ ghi đè.</p></div>
+    <div class="hud3d" id="hud3d" hidden>Báo giá đã phát hành <b id="hudN">0</b></div>
+    <div class="fallback3d" id="fb3d" hidden>Không tải được thư viện 3D. Kiểm tra kết nối mạng rồi mở lại trang.</div>
+    <div class="prog3d"><i id="prog3d"></i></div>
+  </div>
+  <div class="ctl3d">
+    <button class="chip" data-scene="0" aria-pressed="true">1 · Excel rời rạc</button>
+    <button class="chip" data-scene="1" aria-pressed="false">2 · Nền tảng Power Platform</button>
+    <button class="chip" data-scene="2" aria-pressed="false">3 · Dữ liệu chạy qua V1</button>
+    <button class="btn sm" id="play3d">❚❚ Tạm dừng</button>
+  </div>
+</div></section>
+
+<!-- MỤC TIÊU -->
+<section class="sec" id="muc-tieu"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Mục tiêu dự án</h2><p>Xây dựng một nền tảng tập trung quản lý xuyên suốt quy trình lập báo giá, bảo đảm tính chính xác dữ liệu và giảm phụ thuộc vào Excel thủ công.</p></div>
+  <div class="goals">
+    <div class="goal"><i>01</i><b>Chuẩn hóa quy trình</b><span class="muted">PRICE, THKL, NET, LNG/hệ số vật tư phụ/hệ số dự phòng, Tổng hợp và xuất báo giá trên một hệ thống duy nhất.</span></div>
+    <div class="goal"><i>02</i><b>Tập trung dữ liệu</b><span class="muted">Vật tư, đơn giá, khối lượng và báo giá ở một nơi, nhất quán và kiểm soát được.</span></div>
+    <div class="goal"><i>03</i><b>Hạn chế sai sót</b><span class="muted">Tính toán bằng công thức tự động, chuẩn hóa sẵn.</span></div>
+    <div class="goal"><i>04</i><b>Cộng tác nhiều người</b><span class="muted">Nhiều người dùng làm việc trên cùng nền tảng.</span></div>
+    <div class="goal"><i>05</i><b>Sẵn sàng mở rộng</b><span class="muted">Quản lý phiên bản nâng cao, nhật ký kiểm tra chi tiết, bảng điều khiển KPI, tích hợp hệ thống khác.</span></div>
+  </div>
+  <div class="sub">Độ phức tạp hệ thống cần đáp ứng</div>
+  <ul class="clean cx">
+    <li><span class="ic a">1</span><span>Toàn bộ quy trình lập báo giá trên <b>một ứng dụng thống nhất</b>.</span></li>
+    <li><span class="ic a">2</span><span>PRICE, THKL, NET theo từng Dự án; <b>2.000–3.000 dòng/Gói công việc</b>, một Dự án có thể có nhiều Gói công việc.</span></li>
+    <li><span class="ic a">3</span><span>Giảm thao tác thủ công khi chỉnh sửa dữ liệu sau khi nhập.</span></li>
+    <li><span class="ic a">4</span><span>Tự động tính Nhân công, Vật tư, LNG, Tỷ giá, Chiết khấu theo nhóm, hệ số vật tư phụ, hệ số dự phòng và Tổng tiền.</span></li>
+    <li><span class="ic a">5</span><span>Hỗ trợ tối đa <b>03 mẫu báo giá</b> tùy chỉnh.</span></li>
+    <li><span class="ic a">6</span><span>Nhất quán giữa THKL → Ánh xạ/đối chiếu PRICE theo Dự án → NET → Quy tắc tính giá → Tổng hợp → Phê duyệt → Báo giá.</span></li>
+    <li><span class="ic a">7</span><span>Hoàn thiện để vận hành thực tế, UAT và đưa vào vận hành chính thức cho <b>khoảng 50 người dùng</b>.</span></li>
+  </ul>
+</div></section>
+
+<!-- 1. BỐI CẢNH -->
+<section class="sec" id="boi-canh"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>Bối cảnh & hiện trạng</h2><p>Lập báo giá tại NSN hiện chủ yếu trên nhiều file Excel, dữ liệu chia thành các nhóm riêng: PRICE (đơn giá), THKL (khối lượng), NET (tính giá) và Tổng hợp. Xử lý, tổng hợp, kiểm tra phụ thuộc nhiều vào thao tác thủ công; truy vết thay đổi ngày càng khó.</p></div>
+  <div class="grid2 ba">
+    <div class="panel">
+      <h3><span class="tag bad">Hiện tại</span> Báo giá trên nhiều file Excel</h3>
+      <ul class="clean">
+        <li><span class="ic x">✕</span>Dữ liệu phân tán trên nhiều file Excel, phụ thuộc người dùng để đồng bộ; dễ sai khi cập nhật đơn giá/khối lượng</li>
+        <li><span class="ic x">✕</span>Chưa ghi nhận được lịch sử chỉnh sửa (ai sửa, khi nào)</li>
+        <li><span class="ic x">✕</span>Nhiều người cùng xử lý một dự án dễ ghi đè, dữ liệu không đồng nhất</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3><span class="tag ok">Sau V1</span> Một ứng dụng, một nguồn dữ liệu</h3>
+      <ul class="clean">
+        <li><span class="ic v">✓</span>Toàn bộ quy trình từ THKL đến báo giá trên một hệ thống</li>
+        <li><span class="ic v">✓</span>Tính giá tự động bằng công thức chuẩn hóa, ít sai sót</li>
+        <li><span class="ic v">✓</span>Nhiều người dùng cùng làm, dữ liệu tách theo Dự án</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Quy trình nghiệp vụ đã xác nhận cho V1</h3>
+    <div class="flowline"><span>THKL</span><em>→</em><span>Ánh xạ/đối chiếu PRICE theo Dự án</span><em>→</em><span>NET</span><em>→</em><span>LNG/Quy tắc tính giá</span><em>→</em><span>Tổng hợp</span><em>→</em><span>Phê duyệt</span><em>→</em><span>Báo giá khách hàng</span></div>
+    <p class="muted" style="font-size:.85rem;margin-top:10px">PRICE dùng chung tiếp tục là thư viện vật tư/đơn giá chuẩn, quản lý tại một màn hình riêng.</p>
+  </div>
+  <div class="sub">Hiện trạng: POC đã hoàn thành</div>
+  <p style="font-size:.9rem;max-width:80ch">Giai đoạn thử nghiệm khả thi (POC – Proof of Concept) trên Microsoft Power Platform đã hoàn thành, kiểm chứng được tính khả thi của chuỗi nghiệp vụ cốt lõi: mô hình dữ liệu, quy trình nghiệp vụ cốt lõi, khả năng xử lý dữ liệu và trải nghiệm người dùng.</p>
+  <div class="sub">Các hạng mục đã triển khai trong POC</div>
+  <div class="tbl-wrap"><table class="dtbl">
+    <thead><tr><th>Phân hệ</th><th>Đã làm được</th></tr></thead>
+    <tbody>
+      <tr><td>Quản lý PRICE</td><td>Thêm mới/cập nhật/tìm kiếm vật tư, nhập từ Excel, cấu trúc dữ liệu chuẩn hóa làm nguồn đầu vào cho các phân hệ sau.</td></tr>
+      <tr><td>Quản lý THKL</td><td>Cấu trúc Gói công việc / Hạng mục (Section) / Tiểu hạng mục (Subsection) / Dòng; thêm/sửa/xóa thủ công và nhập Excel; chọn vật tư trực tiếp từ PRICE.</td></tr>
+      <tr><td>Hệ số kinh doanh (LNG)</td><td>Hệ số Nhân công và hệ số Vật tư theo Gói công việc; hỗ trợ nhiều mức LNG để phân tích phương án.</td></tr>
+      <tr><td>Tính toán báo giá (NET)</td><td>Kết hợp PRICE + THKL + LNG, tự tính thành tiền, tổng hợp theo nhóm công việc, cập nhật khi dữ liệu đầu vào thay đổi.</td></tr>
+      <tr><td>Tổng hợp</td><td>Màn hình tổng hợp báo giá từ các nhóm công việc, phục vụ rà soát trước khi xuất báo giá.</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- 2. POC -->
+<section class="sec" id="poc"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">04</span><h2>Kết quả PoC & phản hồi dùng thử</h2><p>PoC trên Power Platform đã hoàn thành và đạt cả 4 mục tiêu kiểm chứng. Phản hồi dùng thử là đầu vào cho phiên bản vận hành V1.</p></div>
+  <div class="poc">
+    <div class="panel"><div class="chk"><span class="ic v">✓</span>Mô hình dữ liệu</div><p>PRICE + cây THKL 4 cấp chạy đúng, chọn vật tư trực tiếp từ PRICE.</p><div class="next"><b>V1:</b> giữ nguyên, mở rộng thêm lớp Ánh xạ</div></div>
+    <div class="panel"><div class="chk"><span class="ic v">✓</span>Quy trình cốt lõi</div><p>PRICE → THKL → LNG → NET → Tổng hợp chạy thông trên một ứng dụng.</p><div class="next"><b>V1:</b> thêm Ánh xạ, Phê duyệt, Xuất báo giá</div></div>
+    <div class="panel"><div class="chk"><span class="ic v">✓</span>Xử lý dữ liệu</div><p>Nhập Excel, tự tính thành tiền, so sánh nhiều mức LNG.</p><div class="next"><b>V1:</b> đo hiệu năng ở 2–3 nghìn dòng/Gói</div></div>
+    <div class="panel"><div class="chk"><span class="ic v">✓</span>Người dùng</div><p>NSN đã dùng thử và phản hồi cụ thể từng phân hệ.</p><div class="next"><b>V1:</b> chuyển thành cải tiến F02–F05</div></div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Phản hồi dùng thử">
+    <button class="tab" role="tab" aria-selected="true" data-fb="thkl">THKL</button>
+    <button class="tab" role="tab" aria-selected="false" data-fb="price">PRICE</button>
+    <button class="tab" role="tab" aria-selected="false" data-fb="net">NET</button>
+    <button class="tab" role="tab" aria-selected="false" data-fb="khac">Khác</button>
+    <button class="tab" role="tab" aria-selected="false" data-fb="moi">Bổ sung 28/09</button>
+  </div>
+  <div class="fb" id="fb"></div>
+  <p class="callout ok" id="fbNote"></p>
+</div></section>
+
+<!-- NHU CẦU TỔNG THỂ -->
+<section class="sec" id="nhu-cau"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">05</span><h2>Nhu cầu nghiệp vụ tổng thể</h2><p>NSN cần một hệ thống quản lý báo giá tập trung, quản lý xuyên suốt vòng đời hồ sơ báo giá từ khởi tạo dự án đến phát hành báo giá cho khách hàng. Bảng dưới là phạm vi dài hạn; cột cuối cho biết phần nào nằm trong V1.</p></div>
+  <div class="tbl-wrap"><table class="dtbl">
+    <thead><tr><th style="width:190px">Nhóm nghiệp vụ</th><th>Nội dung</th><th style="width:120px">Trong V1</th></tr></thead>
+    <tbody>
+      <tr><td>Quản lý dự án báo giá</td><td>Khởi tạo/quản lý vòng đời Dự án: mã, tên, khách hàng, phiên bản, trạng thái; là đối tượng trung tâm liên kết THKL/Ánh xạ PRICE/NET/Quy tắc tính giá/Tổng hợp. Bao gồm màn hình SOW và Danh mục vật tư theo Dự án (Material List).</td><td><span class="tag blue">F01</span></td></tr>
+      <tr><td>SOW & Danh mục vật tư theo Dự án</td><td>Hai màn hình dữ liệu theo Dự án để nhập/hiển thị/chỉnh sửa theo cấu trúc đã thống nhất; không bao gồm logic tính toán phức tạp trong V1.</td><td><span class="tag blue">F01</span></td></tr>
+      <tr><td>Quản lý PRICE</td><td>Danh mục PRICE dùng chung là cơ sở dữ liệu vật tư/đơn giá chuẩn. Mỗi Dự án có lớp Ánh xạ PRICE riêng, chỉ hiển thị vật tư phát sinh từ THKL/NET và hỗ trợ đối chiếu trước khi đưa sang NET.</td><td><span class="tag blue">F02</span></td></tr>
+      <tr><td>Quản lý THKL</td><td>Cây khối lượng Gói công việc/Hạng mục/Tiểu hạng mục/Dòng; nhập/thêm/sửa/xóa; vật tư chính và phụ nhập trong cùng file THKL, phân loại bằng Loại/Nhóm vật tư, lọc/thống kê riêng vật tư phụ.</td><td><span class="tag blue">F03</span></td></tr>
+      <tr><td>Quản lý hệ số kinh doanh</td><td>LNG, tỷ giá, Chiết khấu theo nhóm, hệ số vật tư phụ và hệ số dự phòng. Tạm thời quản lý hệ số dự phòng ở cấp Hạng mục (Section); công thức/cơ sở tính rà soát trước khi chốt F05.</td><td><span class="tag blue">F05</span> <span class="tag warn">CXN-01</span></td></tr>
+      <tr><td>Tính toán báo giá (NET)</td><td>Tự động tính dựa trên THKL + Ánh xạ PRICE theo Dự án + Quy tắc tính giá; hiển thị giá riêng lẻ theo vật tư và tổng hợp theo Gói công việc/Hạng mục, không cần cập nhật hàng loạt toàn bộ NET khi chỉ đổi Quy tắc tính giá (nếu thiết kế kỹ thuật cho phép).</td><td><span class="tag blue">F04</span></td></tr>
+      <tr><td>Tổng hợp & biểu mẫu báo giá</td><td>Tổng hợp báo giá; xuất theo nhiều biểu mẫu (tối đa 03 mẫu tùy chỉnh); chuẩn bị hồ sơ trước khi trình duyệt/phát hành.</td><td><span class="tag blue">F06</span></td></tr>
+      <tr><td>Phê duyệt & phiên bản báo giá</td><td>Phê duyệt nhiều bước sau khi hoàn thiện báo giá lần 1; ghi nhận Gửi duyệt/Phê duyệt/Từ chối/Gửi duyệt lại và thông tin phiên bản. <b>Các phiên bản đã duyệt được lưu trữ và có thể khôi phục (backup) phiên bản đã duyệt trước đó khi cần.</b> Ma trận người phê duyệt/điều kiện duyệt rà soát trước khi chốt F06.</td><td><span class="tag blue">F06</span> <span class="tag warn">CXN-02</span></td></tr>
+      <tr><td>Phân quyền / Nhật ký kiểm tra chi tiết</td><td>Phân quyền chi tiết theo chức năng, theo dõi hoạt động người dùng, nhật ký kiểm tra đầy đủ.</td><td><span class="tag grey">Cơ bản ở F01</span><br><span class="muted" style="font-size:.74rem">Nâng cao: ngoài V1</span></td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- 3. LUỒNG -->
+<section class="sec" id="luong"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">06</span><h2>Luồng nghiệp vụ V1 (THKL-first)</h2><p>Bấm từng bước để xem chi tiết, hoặc bấm Chạy để xem cả luồng.</p></div>
+  <div class="flow">
+    <div class="flow-track" id="flowTrack"></div>
+    <div class="flow-detail">
+      <span class="fcode" id="flowCode">F03</span>
+      <span id="flowText"></span>
+      <button class="btn" id="flowPlay">▶ Chạy luồng</button>
+    </div>
+    <p class="shared">PRICE dùng chung = thư viện vật tư/đơn giá chuẩn, quản lý ở màn hình riêng và cấp giá cho bước Ánh xạ.</p>
+  </div>
+</div></section>
+
+<!-- 4. DEMO -->
+<section class="sec" id="demo"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">07</span><h2>Demo: lập một báo giá</h2><p>Bấm thử các nút. Dữ liệu và công thức chỉ để minh họa, công thức chính thức sẽ chốt ở giai đoạn thiết kế chi tiết.</p></div>
+
+  <div class="demo-shell">
+    <div class="appbar"><div><b>DA-2026-014 · Nhà xưởng KCN</b> <small>(dự án mẫu)</small></div><small>Gói công việc: M&E – Điện</small></div>
+    <div class="strip">
+      <div><span>Dòng THKL</span><b id="sRows">0</b></div>
+      <div><span>Đã sang NET</span><b id="sNet">0</b></div>
+      <div><span>Tổng cộng</span><b id="sTotal">0</b></div>
+      <div><span>Trạng thái</span><b id="sStatus">Nháp</b></div>
+    </div>
+    <div class="steps" role="tablist" aria-label="Các bước demo">
+      <button class="step" role="tab" aria-selected="true" data-step="0"><b>BƯỚC 1 · F03</b>Nhập THKL</button>
+      <button class="step" role="tab" aria-selected="false" data-step="1"><b>BƯỚC 2 · F02</b>Ánh xạ PRICE</button>
+      <button class="step" role="tab" aria-selected="false" data-step="2"><b>BƯỚC 3 · F04–F05</b>NET & Quy tắc giá</button>
+      <button class="step" role="tab" aria-selected="false" data-step="3"><b>BƯỚC 4 · F06</b>Tổng hợp & Phê duyệt</button>
+    </div>
+
+    <!-- step 1 -->
+    <div class="pane" data-pane="0">
+      <div class="pane-head">
+        <p>THKL được nhập trước, gồm cả vật tư chính và vật tư phụ trong cùng một file. Có thể chèn dòng vào vị trí bất kỳ.</p>
+        <div class="tools">
+          <button class="chip" aria-pressed="true" data-tf="all">Tất cả</button>
+          <button class="chip" aria-pressed="false" data-tf="Chính">Vật tư chính</button>
+          <button class="chip" aria-pressed="false" data-tf="Phụ">Vật tư phụ</button>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Vật tư</th><th>Hãng</th><th>Loại</th><th>Nhóm</th><th class="r">SL</th><th>ĐV</th><th></th></tr></thead>
+        <tbody id="thklBody"></tbody>
+      </table></div>
+      <p class="note" id="thklNote"></p>
+    </div>
+
+    <!-- step 2 -->
+    <div class="pane" data-pane="1" hidden>
+      <div class="pane-head">
+        <p>Chỉ hiện vật tư của Dự án này. Vật tư thiếu PRICE vẫn được giữ trong THKL, chờ bổ sung. Chỉ dòng <b>Sẵn sàng</b> mới được chuyển sang NET.</p>
+        <button class="btn pri" id="btnSync">Đồng bộ sang NET</button>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Vật tư</th><th>Hãng</th><th class="r">Đơn giá NC (USD)</th><th class="r">Đơn giá VT (USD)</th><th>Trạng thái</th><th>Xử lý</th></tr></thead>
+        <tbody id="mapBody"></tbody>
+      </table></div>
+      <p class="note" id="mapNote"></p>
+    </div>
+
+    <!-- step 3 -->
+    <div class="pane" data-pane="2" hidden>
+      <div class="pane-head"><p>Đổi quy tắc một lần, toàn bộ NET tính lại. Không phải sửa từng dòng.</p></div>
+      <div class="rules">
+        <div class="field"><label for="rRate">Tỷ giá USD/VND (theo Dự án)</label><input id="rRate" type="number" value="25400" step="50" min="20000"></div>
+        <div class="field"><label for="rLngNc">LNG Nhân công</label><select id="rLngNc"><option>1.10</option><option selected>1.15</option><option>1.20</option><option>1.25</option></select></div>
+        <div class="field"><label for="rLngVt">LNG Vật tư</label><select id="rLngVt"><option>1.05</option><option selected>1.10</option><option>1.15</option><option>1.20</option></select></div>
+        <div class="field"><label for="rPhu">Hệ số vật tư phụ</label><select id="rPhu"><option>1.00</option><option selected>1.05</option><option>1.10</option><option>1.15</option></select></div>
+      </div>
+      <div class="disc">
+        <span>Chiết khấu theo nhóm:</span>
+        <select id="dGroup" aria-label="Nhóm vật tư"></select>
+        <input id="dPct" type="number" value="8" min="0" max="50" aria-label="Phần trăm chiết khấu"><span>%</span>
+        <button class="btn sm" id="dApply">Áp cho cả nhóm</button>
+        <span id="dList" style="display:contents"></span>
+      </div>
+      <div class="pane-head" style="margin-bottom:8px">
+        <div class="tools"><label for="brandF" class="muted" style="font-size:.8rem">Lọc theo Hãng</label><select id="brandF" class="chip" style="cursor:pointer"></select></div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Vật tư</th><th>Hãng</th><th class="r">SL</th><th class="r">CK</th><th class="r">Nhân công (VNĐ)</th><th class="r">Vật tư (VNĐ)</th><th class="r">Thành tiền (VNĐ)</th></tr></thead>
+        <tbody id="netBody"></tbody>
+        <tfoot><tr><td colspan="4" id="netFootLbl">Tổng</td><td class="r num" id="netNc"></td><td class="r num" id="netVt"></td><td class="r num" id="netSum"></td></tr></tfoot>
+      </table></div>
+    </div>
+
+    <!-- step 4 -->
+    <div class="pane" data-pane="3" hidden>
+      <div class="sum-grid">
+        <div>
+          <div class="tbl-wrap"><table class="sumtbl"><tbody id="sumBody"></tbody></table></div>
+          <div class="disc" style="margin-top:12px;margin-bottom:0">
+            <span>Hệ số dự phòng theo Hạng mục <span class="tag warn">CXN-01</span></span>
+            <label for="dpCS" class="muted">Chiếu sáng</label><input id="dpCS" type="number" value="2" min="0" max="20" step="0.5"><span>%</span>
+            <label for="dpDL" class="muted">Động lực</label><input id="dpDL" type="number" value="3" min="0" max="20" step="0.5"><span>%</span>
+          </div>
+        </div>
+        <div class="panel appr">
+          <h3>Phê duyệt <span class="tag warn">CXN-02</span></h3>
+          <div class="status-big">Trạng thái: <span class="tag grey" id="apTag">Nháp</span></div>
+          <div class="tools">
+            <button class="btn pri" id="apSend">Gửi duyệt</button>
+            <button class="btn ok" id="apOk" disabled>Phê duyệt</button>
+            <button class="btn bad" id="apNo" disabled>Từ chối</button>
+          </div>
+          <div class="tools">
+            <select id="tpl" class="chip" aria-label="Mẫu báo giá" style="cursor:pointer"><option>Mẫu 1</option><option>Mẫu 2</option><option>Mẫu 3</option></select>
+            <button class="btn" id="apExport" disabled>Xuất báo giá</button>
+          </div>
+          <ul class="log" id="apLog"></ul>
+          <div class="ver-h">Phiên bản đã duyệt (lưu trữ)</div>
+          <ul class="ver" id="apVer"></ul>
+          <p class="note" style="margin-top:0">Demo dùng 1 cấp duyệt. Số cấp, người duyệt và cách xử lý phiên bản sẽ chốt tại CXN-02. Mỗi lần duyệt hệ thống lưu một bản chụp; có thể khôi phục bản đã duyệt trước đó.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="demo-note">Gợi ý thử: chèn "Ổ cắm đôi" ở Bước 1 → bổ sung PRICE cho đèn LED ở Bước 2 → đổi LNG hoặc chiết khấu ở Bước 3 → gửi duyệt và xuất báo giá ở Bước 4. Nếu sửa số sau khi đã duyệt, báo giá tự quay về Nháp; duyệt lại sẽ tạo phiên bản mới, và có thể khôi phục phiên bản đã duyệt trước.</p>
+</div></section>
+
+<!-- 5. PHẠM VI -->
+<section class="sec" id="pham-vi"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">08</span><h2>Phạm vi giải pháp V1: 06 nhóm chức năng</h2><p>Giá triển khai một lần bao gồm F01–F06 theo phạm vi v1.2, cùng hoàn thiện vận hành thực tế, kiểm thử/UAT, triển khai và bàn giao. Đã gồm các nội dung làm rõ/cải tiến sau buổi rà soát 28/09/2026; thay đổi vượt giả định sau khi chốt phạm vi xử lý theo Quy trình CR.</p></div>
+  <div class="formula" aria-label="Nguyên tắc xác định phạm vi">
+    <span class="fx">Phần mềm báo giá</span><span class="op">=</span>
+    <span class="term">Năng lực POC cần hoàn thiện</span><span class="op">+</span>
+    <span class="term">Cải tiến đã xác nhận từ phản hồi POC</span><span class="op">+</span>
+    <span class="term">Hoàn thiện quy trình đầu-cuối</span><span class="op">+</span>
+    <span class="term">Hoàn thiện để vận hành thực tế</span>
+  </div>
+  <div class="tools expand-all"><button class="btn sm" id="fAll">Mở tất cả</button><span class="muted" style="font-size:.8rem">Bấm vào từng thẻ để xem đầy đủ phạm vi, tiêu chí nghiệm thu và sản phẩm bàn giao của mốc.</span></div>
+  <div class="fgrid" id="fgrid"></div>
+
+  <div class="sub" id="cxn"><span class="sn">5.7</span>Nội dung cần rà soát và xác nhận trước khi chốt thiết kế</div>
+  <p class="muted" style="font-size:.88rem;margin-bottom:10px">Hai nội dung này <b>đã nằm trong phạm vi V1</b>, nhưng chi tiết thiết kế cần NSN và nhóm triển khai rà soát trước khi khóa F05/F06. Tách riêng để tránh hiểu nhầm là đã chốt hoàn toàn.</p>
+  <div class="tbl-wrap"><table class="wide">
+    <thead><tr><th>Mã</th><th>Nội dung</th><th>Phương án tạm thời</th><th>Cần xác nhận trước khi chốt</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag warn">CXN-01</span></td><td><b>Hệ số dự phòng</b></td><td>Quản lý ở cấp Hạng mục (Section), có màn hình riêng trong nhóm Quy tắc tính giá.</td><td>Công thức, giá trị làm cơ sở tính và cách tổng hợp lên Gói công việc/Tổng hợp. <b>Chốt trước khi khóa F05.</b></td></tr>
+      <tr><td><span class="tag warn">CXN-02</span></td><td><b>Quy trình phê duyệt</b></td><td>Kích hoạt sau khi báo giá hoàn thiện lần 1.</td><td>Số cấp duyệt, ma trận người phê duyệt, nguồn xác định người duyệt, điều kiện Gửi duyệt/Phê duyệt/Từ chối/Gửi duyệt lại và cách quản lý phiên bản. <b>Chốt trước khi khóa F06.</b></td></tr>
+    </tbody>
+  </table></div>
+  <p class="callout warn">Mức giá tạm tính <b>265.000.000 VNĐ</b> và tiến độ hiện tại <b>đã bao gồm</b> hai nội dung trên theo phương án tạm thời. Nếu kết quả rà soát làm thay đổi đáng kể phạm vi hoặc độ phức tạp, tác động sẽ được đánh giá theo Quy trình yêu cầu thay đổi (CR).</p>
+</div></section>
+
+<!-- 6. KIẾN TRÚC -->
+<section class="sec" id="kien-truc"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">09</span><h2>Kiến trúc giải pháp</h2><p>Tiếp tục dùng Microsoft Power Platform đã kiểm chứng ở POC. Power Apps lo giao diện, hiển thị và kiểm tra nhẹ; cập nhật hàng loạt, đối chiếu PRICE, điều phối phê duyệt và tính toán/tổng hợp lớn chạy phía máy chủ hoặc chạy nền.</p></div>
+  <div class="arch">
+    <div class="layer"><div><b>Power Apps (Canvas)</b><small>Trải nghiệm người dùng</small></div><p>Giao diện, đọc dữ liệu theo truy vấn có thể ủy quyền, kiểm tra nhẹ; tách màn hình PRICE dùng chung và Ánh xạ theo Dự án; không lặp/cập nhật hàng nghìn dòng trực tiếp từ ứng dụng.</p></div>
+    <div class="layer"><div><b>Power Automate</b><small>Xử lý nghiệp vụ</small></div><p>Nhập dữ liệu, đối chiếu THKL→PRICE, đồng bộ, quy trình phê duyệt, thử lại, trạng thái tác vụ, tính toán/tổng hợp chạy nền.</p></div>
+    <div class="layer"><div><b>SharePoint Online</b><small>Tầng dữ liệu</small></div><p>Danh mục PRICE dùng chung + dữ liệu/ánh xạ/Quy tắc tính giá theo Dự án; được đánh chỉ mục và kiểm soát nguồn dữ liệu chuẩn.</p></div>
+    <div class="layer"><div><b>Excel + Office Scripts</b><small>Nhập / Xuất dữ liệu</small></div><p>Nhập PRICE/THKL (bao gồm vật tư phụ), xuất báo giá theo mẫu, đối chiếu đầu ra.</p></div>
+    <div class="layer"><div><b>Microsoft Entra ID / M365</b><small>Định danh & truy cập</small></div><p>Xác thực, phân quyền cơ bản theo vai trò và xác định người duyệt theo thiết kế phê duyệt đã chốt.</p></div>
+  </div>
+  <p class="principle"><b>Nguyên tắc xuyên suốt:</b> ưu tiên hiệu năng, khả năng truy vết và vận hành ổn định trước khi mở rộng chức năng. PRICE dùng chung là danh mục chuẩn; mỗi Dự án dùng lớp ánh xạ riêng. Quy tắc tính giá là nguồn chuẩn cho LNG/tỷ giá/chiết khấu/hệ số, hạn chế cập nhật hàng loạt dòng NET khi chỉ đổi quy tắc; NET và Tổng hợp đọc/tính nhất quán từ cùng nguồn.</p>
+
+  <div class="sub"><span class="sn">6.1</span>Hoàn thiện để vận hành thực tế <span class="tag grey">áp dụng xuyên suốt F01–F06, không phải bước riêng cuối dự án</span></div>
+  <div class="ops">
+    <div class="panel"><h3>Độ tin cậy</h3><ul><li>Luồng chuẩn, xử lý lỗi</li><li>Thử lại, chống xử lý trùng</li><li>Trạng thái tác vụ, ghi nhật ký</li><li>Toàn vẹn dữ liệu</li></ul></div>
+    <div class="panel"><h3>Hiệu năng</h3><ul><li>Đánh chỉ mục SharePoint</li><li>Truy vấn có thể ủy quyền, xử lý theo lô</li><li>Giảm N+1, giảm tổng hợp phía ứng dụng</li><li>Tối ưu Nhập/Đồng bộ/Tính lại/Xuất</li></ul></div>
+    <div class="panel"><h3>Khả năng bảo trì</h3><ul><li>Loại bỏ logic cũ/thử nghiệm/sao chép</li><li>Chuẩn hóa quy tắc đặt tên</li><li>Thành phần tái sử dụng</li><li>Một nguồn dữ liệu chuẩn cho Tổng hợp</li></ul></div>
+    <div class="panel"><h3>Quản lý vòng đời (ALM)</h3><ul><li>Power Platform Solution</li><li>Biến môi trường, Tham chiếu kết nối</li><li>Phát triển / UAT / Vận hành</li><li>Quy trình triển khai</li></ul></div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="panel">
+      <h3><span class="sn muted" style="font-size:.75rem">6.2</span> Bảo mật & phân quyền</h3>
+      <ul class="clean" style="margin-top:10px;font-size:.86rem">
+        <li><span class="ic v">✓</span>Xác thực qua Microsoft 365 / Microsoft Entra ID; phân quyền ứng dụng cơ bản theo vai trò.</li>
+        <li><span class="ic v">✓</span>Mô hình phân quyền SharePoint phù hợp kiến trúc ứng dụng. Chỉ ẩn thành phần giao diện trong Power Apps <b>không</b> được xem là bảo mật dữ liệu.</li>
+        <li><span class="ic x">✕</span>Chưa bao gồm: phân cấp tổ chức nâng cao, phân quyền theo vai trò ở cấp bản ghi, mô hình phân quyền đa vùng.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3><span class="sn muted" style="font-size:.75rem">6.3</span> Kiểm thử & UAT</h3>
+      <div class="tlayers"><span class="tag blue">Chức năng</span><span class="tag blue">Tích hợp</span><span class="tag blue">Hồi quy</span><span class="tag blue">Hiệu năng</span><span class="tag blue">Đầu-cuối</span><span class="tag ok">UAT</span></div>
+      <ul class="clean" style="font-size:.86rem">
+        <li><span class="ic a">▸</span>Quy mô dữ liệu: khoảng 2.000–3.000 dòng/<b>Gói công việc</b> (không phải cho toàn bộ Dự án).</li>
+        <li><span class="ic a">▸</span><span>UAT đầu-cuối: ít nhất một Dự án đại diện chạy xuyên suốt
+          <span class="uatflow"><span>Tạo Dự án</span><em>→</em><span>THKL chính + phụ</span><em>→</em><span>Ánh xạ PRICE</span><em>→</em><span>NET</span><em>→</em><span>LNG/CK/Quy tắc</span><em>→</em><span>Phân tích Hãng</span><em>→</em><span>Tổng hợp</span><em>→</em><span>Phê duyệt</span><em>→</em><span>Mẫu báo giá</span><em>→</em><span>Xuất/Phát hành</span></span></span></li>
+        <li><span class="ic a">▸</span>Hiệu năng: tính đúng ở quy mô thực tế là bắt buộc. Thời gian xử lý (Nhập, Đối chiếu, Đồng bộ, Tính lại/Tổng hợp, Tải màn hình, Phê duyệt, Xuất) sẽ được đo kiểm và thống nhất trước UAT; <b>chưa cam kết mức thời gian cụ thể</b> khi chưa có kết quả đo.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 7. CHI PHÍ -->
+<section class="sec" id="chi-phi"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">10</span><h2>Chi phí & mô hình nghiệm thu</h2><p>Nhóm dự án 03 vai trò chính. Phần tăng so với v1.1 tập trung cho Ánh xạ PRICE theo Dự án, nhập & thống kê vật tư phụ, SOW/Danh mục vật tư, Quy tắc tính giá/Hệ số dự phòng, Quy trình phê duyệt và kiểm thử hồi quy/UAT bổ sung.</p></div>
+  <div class="cmp">
+    <div><span>Phiên bản v1.1</span><b>250.800.000</b><small>VNĐ · 198 ngày công</small></div>
+    <div><span>Phiên bản v1.2 (hiện tại)</span><b>265.000.000</b><small>VNĐ · ~209 ngày công</small></div>
+    <div class="up"><span>Chênh lệch</span><b>+14.200.000</b><small>VNĐ · +11 ngày công</small></div>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Thanh toán theo mốc nghiệm thu</h3>
+      <div class="paybar" id="paybar"></div>
+      <div class="paylegend" id="paylegend"></div>
+    </div>
+    <div class="panel">
+      <h3>Ước tính ngày công & chi phí theo vai trò</h3>
+      <div class="tbl-wrap" style="margin-top:10px"><table>
+        <thead><tr><th>Vai trò</th><th class="r">Ngày công</th><th class="r">Chi phí (VNĐ)</th></tr></thead>
+        <tbody>
+          <tr><td>BA</td><td class="r num">68</td><td class="r num">88.400.000</td></tr>
+          <tr><td>Phát triển Power Platform</td><td class="r num">71</td><td class="r num">113.600.000</td></tr>
+          <tr><td>Kiểm thử / QA</td><td class="r num">70</td><td class="r num">63.000.000</td></tr>
+        </tbody>
+        <tfoot><tr><td>Tổng nhân sự</td><td class="r num">209</td><td class="r num">265.000.000</td></tr></tfoot>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="sub"><span class="sn">7.2</span>Các giai đoạn nghiệm thu</div>
+  <p class="muted" style="font-size:.88rem;margin-bottom:10px">Thanh toán theo các mốc nghiệm thu chức năng để phản ánh giá trị đã bàn giao từng giai đoạn; UAT đầu-cuối và đưa vào vận hành chính thức là mốc nghiệm thu cuối. Quản lý dự án theo chu kỳ triển khai, kết hợp nghiệm thu theo khối lượng tương tự cách quản lý trong ngành xây dựng.</p>
+  <div class="tbl-wrap"><table class="wide">
+    <thead><tr><th>Mốc</th><th class="r">Tỷ lệ</th><th class="r">Thành tiền (VNĐ)</th><th>Sản phẩm bàn giao</th><th>Điều kiện nghiệm thu</th></tr></thead>
+    <tbody id="payTbl"></tbody>
+    <tfoot><tr><td>Tổng</td><td class="r num">100%</td><td class="r num">265.000.000</td><td colspan="2"></td></tr></tfoot>
+  </table></div>
+  <p class="callout blue">Nghiệm thu chức năng theo từng nhóm có thể làm cơ sở cho mốc thanh toán, nhưng <b>không thay thế nghiệm thu đầu-cuối cuối cùng</b> trước khi đưa vào vận hành chính thức.</p>
+</div></section>
+
+<!-- ĐIỀU KHOẢN -->
+<section class="sec" id="dieu-khoan"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">11</span><h2>Điều khoản thương mại & rủi ro</h2></div>
+  <div class="terms2">
+    <div class="panel"><h3><span class="tag ok">7.3</span> Bảo hành</h3><p>Tối đa <b>03 tháng</b> kể từ ngày đưa vào vận hành chính thức, khắc phục lỗi thuộc phạm vi đã nghiệm thu.</p><p class="excl">Không bao gồm: yêu cầu mới; thay đổi dữ liệu/môi trường/quyền truy cập; lỗi nền tảng Microsoft; Yêu cầu thay đổi (CR).</p></div>
+    <div class="panel"><h3><span class="tag ok">7.4</span> Bảo trì hằng năm</h3><p>Sau bảo hành, NSN có thể dùng gói bảo trì tương đương <b>10% giá trị hợp đồng/năm</b> (chưa VAT), tức khoảng 26.500.000 VNĐ/năm theo giá tạm tính.</p></div>
+    <div class="panel"><h3><span class="tag ok">7.5</span> Thuế TNCN (PIT)</h3><ul>
+      <li>Đại diện Trưởng nhóm triển khai ký Hợp đồng Dịch vụ Xây dựng Phần mềm với tư cách cá nhân.</li>
+      <li>Bên A (NSN) khấu trừ, kê khai, nộp PIT và làm thủ tục quyết toán thuế cho các khoản thanh toán theo Hợp đồng, đúng quy định pháp luật.</li>
+      <li>Bên A cung cấp đầy đủ chứng từ khấu trừ thuế; Đại diện Trưởng nhóm cung cấp thông tin, hồ sơ và phối hợp khi quyết toán. Nghĩa vụ thuế từ nguồn thu nhập khác không thuộc Hợp đồng này.</li></ul></div>
+    <div class="panel"><h3><span class="tag ok">7.6</span> Mẫu báo giá tùy chỉnh</h3><ul>
+      <li>Tối đa <b>03 mẫu</b>, được NSN và đơn vị triển khai xác nhận trước khi chốt phạm vi F06.</li>
+      <li>Mẫu thứ 4 trở đi, hoặc thay đổi đáng kể cấu trúc mẫu đã chốt, đánh giá theo CR; chi phí theo ước tính ngày công hoặc phí cố định tùy độ phức tạp.</li></ul></div>
+    <div class="panel" style="grid-column:span 2"><h3><span class="tag ok">7.7</span> Quy trình yêu cầu thay đổi (CR)</h3>
+      <div class="uatflow" style="font-size:.8rem;margin:4px 0 8px"><span>Đánh giá tác động</span><em>→</em><span>Ước tính ngày công</span><em>→</em><span>Đánh giá tác động tiến độ</span><em>→</em><span>Phê duyệt thương mại</span><em>→</em><span>Thực hiện</span></div>
+      <p>Áp dụng cho:</p><ul>
+      <li>Quy tắc nghiệp vụ hoặc quy trình xử lý mới.</li>
+      <li>Chức năng hoặc trường dữ liệu mới có ảnh hưởng đến thiết kế.</li>
+      <li>Bổ sung mẫu báo giá hoặc thay đổi lớn với mẫu đã chốt.</li>
+      <li>Thay đổi tiêu chí nghiệm thu hoặc phạm vi sau khi đã chốt phạm vi.</li></ul></div>
+  </div>
+
+  <div class="sub"><span class="sn">7.8</span>Các phát sinh dự kiến & rủi ro gây chậm triển khai</div>
+  <div class="tbl-wrap"><table class="dtbl">
+    <thead><tr><th style="width:210px">Hạng mục</th><th>Dự kiến</th></tr></thead>
+    <tbody>
+      <tr><td>Thời gian triển khai</td><td>Khoảng 03 tháng + 01 tuần; phụ thuộc việc chốt phạm vi cập nhật, CXN-01/CXN-02, mẫu/dữ liệu UAT và không có thay đổi đáng kể về Phê duyệt/Quy tắc tính giá sau khi chốt phạm vi.</td></tr>
+      <tr><td>Giấy phép Microsoft</td><td>Không bao gồm trong phí triển khai, trừ khi nêu rõ trong báo giá cuối. NSN cần xác nhận giấy phép/gói thuê bao hiện có trước khi đưa vào vận hành chính thức.</td></tr>
+      <tr><td>Hạ tầng M365/Power Platform</td><td>Sử dụng môi trường Microsoft 365/Power Platform của NSN hoặc môi trường do hai bên thống nhất.</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- 8. KẾ HOẠCH -->
+<section class="sec" id="ke-hoach"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">12</span><h2>Kế hoạch triển khai ~3 tháng + 1 tuần</h2><p>Tính từ khi chốt phạm vi cơ sở, CXN-01/CXN-02, 03 mẫu báo giá, cấu trúc SOW/Danh mục vật tư và bộ dữ liệu UAT. Phần tăng ~11 ngày công so với v1.1 chủ yếu bố trí vào giai đoạn cuối phát triển và kiểm thử hồi quy/UAT.</p></div>
+  <div class="tl">
+    <div class="m"><div class="bar"></div><div class="when">Tháng 1</div><h3>Xác nhận phạm vi & nền tảng vận hành</h3><div class="fs"><span class="tag blue">F01</span><span class="tag blue">F02</span><span class="tag grey">F03 bắt đầu</span></div><ul><li>Chốt yêu cầu cập nhật</li><li>Nền tảng ALM</li><li>Tái cấu trúc cho vận hành</li><li>Chốt cấu trúc dữ liệu SOW/Danh mục vật tư</li></ul></div>
+    <div class="m"><div class="bar"></div><div class="when">Tháng 2</div><h3>Hoàn thiện nghiệp vụ báo giá cốt lõi</h3><div class="fs"><span class="tag acc">F03</span><span class="tag acc">F04</span><span class="tag acc">F05</span></div><ul><li>Ánh xạ PRICE theo Dự án</li><li>Vật tư phụ trong THKL</li><li>Quy tắc tính giá, tối ưu hiệu năng</li><li>Kiểm thử tích hợp</li><li>Rà soát CXN-01</li></ul></div>
+    <div class="m"><div class="bar"></div><div class="when">Tháng 3 + ~1 tuần</div><h3>Phê duyệt, Xuất báo giá, UAT & vận hành</h3><div class="fs"><span class="tag ok">F06</span></div><ul><li>Rà soát/chốt CXN-02, Quy trình phê duyệt</li><li>03 mẫu báo giá</li><li>Kiểm thử đầu-cuối, quy mô vận hành, hồi quy/UAT</li><li>Sửa lỗi, triển khai, đào tạo</li><li>Đưa vào vận hành chính thức</li></ul></div>
+  </div>
+  <p class="callout">Tiến độ chi tiết được xác nhận sau khi các đầu vào trên được chốt. Thay đổi đáng kể về phạm vi hoặc chậm trễ từ phụ thuộc phía khách hàng có thể ảnh hưởng tiến độ.</p>
+</div></section>
+
+<!-- 9. XÁC NHẬN -->
+<section class="sec confirm" id="xac-nhan"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">13</span><h2>Điều kiện để khóa giá cố định</h2><p>Giá v1.2 tạm tính 265.000.000 VNĐ dựa trên giả định hiện tại. Thay đổi đáng kể sau khi chốt CXN-01/CXN-02 sẽ đánh giá theo CR.</p></div>
+  <ol class="lockl">
+    <li><span><span class="tag warn">CXN-01</span> Công thức/cơ sở tính <b>hệ số dự phòng cấp Hạng mục</b> (Section) được xác nhận <b>trước khi chốt F05</b>.</span></li>
+    <li><span><span class="tag warn">CXN-02</span> <b>Ma trận phê duyệt</b>: số cấp, nguồn xác định người duyệt, điều kiện Gửi duyệt/Phê duyệt/Từ chối/Gửi duyệt lại và cách xử lý phiên bản được xác nhận <b>trước khi chốt F06</b>.</span></li>
+    <li><span><span class="tag blue">Phạm vi</span> Cấu trúc SOW/Danh mục vật tư, 03 mẫu báo giá tùy chỉnh và Tài liệu phạm vi/Danh mục yêu cầu được chốt.</span></li>
+    <li><span><span class="tag blue">Giá</span> Giá v1.2 tạm tính 265.000.000 VNĐ theo giả định hiện tại; thay đổi đáng kể sau khi chốt CXN-01/CXN-02 xử lý theo CR.</span></li>
+    <li><span><span class="tag blue">Phụ thuộc</span> Phụ thuộc phía khách hàng và trách nhiệm UAT được thống nhất. Phê duyệt dùng Microsoft 365/Power Automate trong môi trường M365 của NSN; không gồm cổng phê duyệt bên ngoài, chữ ký điện tử hoặc phân cấp tổ chức nâng cao nếu chưa có CR.</span></li>
+  </ol>
+</div></section>
+
+<!-- NGOÀI PHẠM VI + BÀN GIAO -->
+<section class="sec" id="ban-giao"><div class="wrap">
+  <div class="sec-head"><span class="sec-no">14</span><h2>Ngoài phạm vi V1 & sản phẩm bàn giao</h2></div>
+  <div class="grid2">
+    <div>
+      <h3 style="margin-bottom:10px">Ngoài phạm vi phiên bản vận hành V1</h3>
+      <div class="oosl">
+        <div><span class="ic x">✕</span>Bảng điều khiển Quản lý đấu thầu / Phân tích dữ liệu nâng cao (BI)</div>
+        <div><span class="ic x">✕</span>Tích hợp ERP/CRM</div>
+        <div><span class="ic x">✕</span>Phân cấp tổ chức nâng cao / phân quyền theo vai trò ở cấp bản ghi</div>
+        <div><span class="ic x">✕</span>Mô hình giá riêng theo khu vực HN/HCM</div>
+        <div><span class="ic x">✕</span>Chức năng AI/Copilot</div>
+        <div><span class="ic x">✕</span>Cổng khách hàng bên ngoài</div>
+        <div><span class="ic x">✕</span>Ứng dụng ngoại tuyến/riêng cho thiết bị di động</div>
+        <div><span class="ic x">✕</span>Di chuyển dữ liệu báo giá lịch sử</div>
+        <div><span class="ic x">✕</span>Phê duyệt nâng cao ngoài ma trận đã chốt, cổng phê duyệt bên ngoài, chữ ký điện tử</div>
+        <div><span class="ic x">✕</span>So sánh/Lịch sử phiên bản nâng cao vượt mức trạng thái/bản chụp cần cho Phê duyệt V1</div>
+      </div>
+      <p class="note">Các hạng mục trên chỉ được đưa vào phạm vi thông qua Quy trình CR, sau khi NSN xác nhận yêu cầu và tác động thương mại/kỹ thuật.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px">Sản phẩm bàn giao</h3>
+      <ul class="clean" style="font-size:.86rem">
+        <li><span class="ic v">✓</span>Ứng dụng Power Apps Canvas.</li>
+        <li><span class="ic v">✓</span>Cấu trúc dữ liệu/cấu hình SharePoint: Danh mục PRICE dùng chung, Ánh xạ PRICE theo Dự án, dữ liệu/Quy tắc tính giá theo từng Dự án.</li>
+        <li><span class="ic v">✓</span>Các luồng Power Automate cho vận hành thực tế (nhập dữ liệu/đối chiếu/đồng bộ/phê duyệt) và các Office Script cần thiết.</li>
+        <li><span class="ic v">✓</span>03 mẫu báo giá tùy chỉnh.</li>
+        <li><span class="ic v">✓</span>Cấu hình vận hành và gói triển khai cho môi trường Phát triển/UAT/Vận hành.</li>
+        <li><span class="ic v">✓</span>Tài liệu yêu cầu & nghiệm thu; bộ tình huống kiểm thử UAT.</li>
+        <li><span class="ic v">✓</span>Hướng dẫn người dùng; Hướng dẫn quản trị/vận hành và tài liệu vận hành.</li>
+        <li><span class="ic v">✓</span>Đào tạo và hỗ trợ đưa vào vận hành chính thức theo điều khoản thương mại cuối cùng.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">Trình bày đầy đủ theo "NSN_Quan_ly_Bao_gia_Proposal_v1.2" (cập nhật sau buổi rà soát 28/09/2026). Số liệu trong phần Demo là dữ liệu mẫu để minh họa; công thức chính thức chốt ở giai đoạn thiết kế chi tiết.</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const vnd=n=>Math.round(n).toLocaleString('vi-VN');
+const toast=(m)=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400)};
+
+/* ---------- Phản hồi dùng thử ---------- */
+const FB={
+ thkl:[["Thêm vật tư chỉ vào cuối Tiểu hạng mục","Chèn vào vị trí bất kỳ"],["Đổi hãng phải xóa và nhập lại","Đổi hãng trực tiếp"],["Vật tư thiếu PRICE bị loại khỏi THKL","Giữ lại, chuyển sang Ánh xạ PRICE"]],
+ price:[["Một màn hình PRICE cho mọi thứ","Tách: PRICE dùng chung + Ánh xạ theo Dự án"],["Chiết khấu nhập từng vật tư","Chiết khấu theo Nhóm vật tư"],["Tìm theo ký tự đầu","Tìm theo ký tự bất kỳ"]],
+ net:[["Không xem được tổng theo Hãng","Lọc và tổng hợp theo Hãng"],["Chi phí phụ (Misc) tính sai, tạo thủ công","Tự động, tính trên tổng VNĐ sau LNG"],["Vật tư phụ nhập riêng","Nhập chung file THKL, lọc/thống kê riêng"]],
+ khac:[["Đổi tỷ giá phải nhập lại file","Đổi tỷ giá trực tiếp theo Dự án, không phụ thuộc nhập lại"],["Xóa dữ liệu (THKL, PRICE) là xóa toàn bộ","Xóa theo từng Gói công việc"]],
+ moi:[["Chưa có SOW & Danh mục vật tư","Thêm 2 màn hình nhập/xem/sửa theo định dạng đã thống nhất, không có logic tính riêng"],["Chưa có màn hình hệ số dự phòng","Thêm màn hình riêng, tạm quản lý cấp Hạng mục (CXN-01)"],["Chưa có phê duyệt","Thêm quy trình phê duyệt sau báo giá lần 1 (CXN-02)"]]
+};
+const FBN={
+ thkl:'<b>THKL-first:</b> vật tư chưa có trong PRICE dùng chung không bị loại khỏi THKL, mà vào màn hình Ánh xạ PRICE theo Dự án ở trạng thái Chờ xử lý/Thiếu PRICE để bổ sung hoặc đối chiếu trước khi đủ điều kiện sang NET.',
+ price:'<b>02 màn hình PRICE:</b> (1) Danh mục PRICE dùng chung quản trị toàn bộ thư viện vật tư/đơn giá; (2) Ánh xạ PRICE theo Dự án chỉ hiện vật tư phát sinh từ THKL/NET của Dự án, kèm trạng thái đối chiếu.',
+ net:'<b>Vật tư phụ</b> (phụ kiện, giá đỡ, kiểm thử…) chuẩn hóa ngay trong file THKL bằng Loại/Nhóm vật tư; lọc và thống kê riêng theo Gói công việc/Hạng mục/Tiểu hạng mục để kiểm tra đủ và dùng nhất quán ở bước tính giá/NET. <b>Chi phí phụ (Misc)</b> tính trên tổng VNĐ sau LNG, không phải trên USD trước LNG.',
+ khac:'<b>BD-01 đã đóng:</b> luồng V1 xác nhận THKL-first (THKL → Ánh xạ/đối chiếu PRICE theo Dự án → NET), không còn là vấn đề cần xác nhận.',
+ moi:'<b>Quyết định sau rà soát 28/09/2026</b> đã nằm trong phạm vi và giá v1.2. Chi tiết CXN-01 (hệ số dự phòng) và CXN-02 (phê duyệt) cần chốt ở giai đoạn thiết kế chi tiết, trước khi khóa F05/F06.'
+};
+function renderFb(k){$('#fb').innerHTML=FB[k].map(([a,b])=>`<div class="row"><span><span class="tag bad">Trước</span> ${a}</span><span class="arrow">→</span><span><span class="tag ok">V1</span> ${b}</span></div>`).join('');
+ $('#fbNote').innerHTML=FBN[k];
+ $$('[data-fb]').forEach(b=>b.setAttribute('aria-selected',b.dataset.fb===k))}
+$$('[data-fb]').forEach(b=>b.onclick=()=>renderFb(b.dataset.fb)); renderFb('thkl');
+
+/* ---------- Luồng ---------- */
+const FLOW=[
+ ["THKL","F03","Nhập khối lượng trước: Gói công việc → Hạng mục → Tiểu hạng mục → Dòng, gồm cả vật tư chính và phụ.",0],
+ ["Ánh xạ PRICE","F02","Đối chiếu từng vật tư của Dự án với PRICE dùng chung. Thiếu PRICE thì chờ bổ sung, không mất THKL.",1],
+ ["NET","F04","Chỉ dòng Sẵn sàng được đồng bộ sang NET. Tự tính Nhân công/Vật tư, xem theo Hãng.",2],
+ ["Quy tắc giá","F05","LNG, tỷ giá, chiết khấu theo nhóm, hệ số vật tư phụ và dự phòng. Đổi một lần, NET tính lại.",2],
+ ["Tổng hợp","F06","Tổng theo Gói công việc, làm tròn, chi phí phụ. Cùng nguồn số liệu với NET.",3],
+ ["Phê duyệt","F06","Gửi duyệt → Phê duyệt / Từ chối → Gửi duyệt lại.",3],
+ ["Báo giá","F06","Xuất Excel theo 1 trong 03 mẫu, giữ định dạng và công thức.",3]
+];
+let fi=0, ftimer=null;
+$('#flowTrack').innerHTML=FLOW.map((f,i)=>`<button class="node" data-i="${i}"><span class="dot">${i+1}</span><span class="lbl">${f[0]}</span><span class="fc">${f[1]}</span></button>`).join('');
+function setFlow(i){fi=i;$$('.node').forEach((n,j)=>{n.classList.toggle('on',j===i);n.classList.toggle('done',j<i)});
+ $('#flowCode').textContent=FLOW[i][1];$('#flowText').innerHTML=FLOW[i][2]+` <a href="#demo" data-goto="${FLOW[i][3]}" style="color:var(--accent);white-space:nowrap">Thử trong demo →</a>`}
+$$('.node').forEach(n=>n.onclick=()=>{stopFlow();setFlow(+n.dataset.i)});
+function stopFlow(){clearInterval(ftimer);ftimer=null;$('#flowPlay').textContent='▶ Chạy luồng'}
+$('#flowPlay').onclick=()=>{if(ftimer){stopFlow();return}
+ setFlow(0);$('#flowPlay').textContent='❚❚ Dừng';ftimer=setInterval(()=>{if(fi>=FLOW.length-1){stopFlow();return}setFlow(fi+1)},1500)};
+setFlow(0);
+document.addEventListener('click',e=>{const a=e.target.closest('[data-goto]');if(a)goStep(+a.dataset.goto)});
+
+/* ---------- DEMO data ---------- */
+let uid=100;
+const rows=[
+ {id:1,sec:'Chiếu sáng',name:'Đèn LED panel 600×600 40W',brand:'Rạng Đông',type:'Chính',group:'Thiết bị chiếu sáng',qty:180,unit:'bộ',price:null,fix:{nc:4,vt:18},status:'missing',net:false},
+ {id:2,sec:'Chiếu sáng',name:'Cáp CVV 3×2.5mm²',brand:'Cadivi',type:'Chính',group:'Cáp',qty:1200,unit:'m',price:{nc:.35,vt:1.1},status:'ready',net:true},
+ {id:3,sec:'Chiếu sáng',name:'Ống luồn PVC D20',brand:'Sino',type:'Chính',group:'Ống & phụ kiện',qty:900,unit:'m',price:{nc:.2,vt:.3},status:'ready',net:true},
+ {id:4,sec:'Chiếu sáng',name:'Giá đỡ thang cáp',brand:'—',type:'Phụ',group:'Vật tư phụ',qty:220,unit:'bộ',price:{nc:1.5,vt:3.2},status:'ready',net:true},
+ {id:5,sec:'Động lực',name:'Tủ điện phân phối DB-01',brand:'Schneider',type:'Chính',group:'Tủ điện',qty:4,unit:'tủ',price:{nc:60,vt:850},status:'ready',net:true},
+ {id:6,sec:'Động lực',name:'Aptomat MCB 1P 16A',brand:'Schneider',type:'Chính',group:'Thiết bị đóng cắt',qty:96,unit:'cái',price:{nc:.8,vt:4.5},fix:{nc:.8,vt:4.8},status:'update',net:false},
+ {id:7,sec:'Động lực',name:'Cáp CXV 4×16mm²',brand:'Cadivi',type:'Chính',group:'Cáp',qty:350,unit:'m',price:{nc:.9,vt:6.4},status:'ready',net:true},
+ {id:8,sec:'Động lực',name:'Kiểm thử & nghiệm thu hệ thống',brand:'—',type:'Phụ',group:'Vật tư phụ',qty:1,unit:'gói',price:{nc:900,vt:0},status:'ready',net:true},
+];
+const INSERT={sec:'Động lực',name:'Ổ cắm đôi 16A',brand:'Panasonic',type:'Chính',group:'Thiết bị điện',qty:60,unit:'cái',price:{nc:1.2,vt:2.6},status:'ready',net:false};
+let inserted=false, tFilter='all', brandFilter='all';
+const discounts={'Cáp':5};
+let appr='draft'; const log=[]; const versions=[]; let curVer=null;
+const INPUTS=['#rRate','#rLngNc','#rLngVt','#rPhu','#dpCS','#dpDL'];
+
+const R=()=>({rate:+$('#rRate').value||0,lngNc:+$('#rLngNc').value,lngVt:+$('#rLngVt').value,phu:+$('#rPhu').value});
+function calc(r){const p=R();const ck=(discounts[r.group]||0)/100;const k=r.type==='Phụ'?p.phu:1;
+ const nc=r.qty*r.price.nc*p.rate*p.lngNc*k;const vt=r.qty*r.price.vt*(1-ck)*p.rate*p.lngVt*k;return {nc,vt,ck}}
+const netRows=()=>rows.filter(r=>r.net&&r.price);
+function totals(){let nc=0,vt=0;const bySec={};netRows().forEach(r=>{const c=calc(r);nc+=c.nc;vt+=c.vt;bySec[r.sec]=(bySec[r.sec]||0)+c.nc+c.vt});
+ const base=nc+vt;const misc=base*.03;const dp=(bySec['Chiếu sáng']||0)*(+$('#dpCS').value||0)/100+(bySec['Động lực']||0)*(+$('#dpDL').value||0)/100;
+ const raw=base+misc+dp;return {nc,vt,base,misc,dp,raw,total:Math.round(raw/1000)*1000,bySec}}
+
+const STAT={ready:['ok','Sẵn sàng'],missing:['bad','Thiếu PRICE'],update:['warn','Cần cập nhật']};
+const usd=v=>v==null?'<span class="muted">—</span>':v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function renderThkl(){let html='',cur='';
+ rows.forEach(r=>{if(tFilter!=='all'&&r.type!==tFilter)return;
+  if(r.sec!==cur){cur=r.sec;html+=`<tr class="sec-row"><td colspan="7">Hạng mục: ${cur}</td></tr>`}
+  html+=`<tr class="${r._new?'new':''}"><td>${r.name}</td><td>${r.brand}</td><td><span class="tag ${r.type==='Phụ'?'acc':'grey'}">${r.type}</span></td><td>${r.group}</td><td class="r num">${r.qty.toLocaleString('vi-VN')}</td><td>${r.unit}</td><td>${!inserted&&r.id===6?'<button class="btn sm" id="btnIns">+ Chèn dòng bên dưới</button>':''}</td></tr>`});
+ $('#thklBody').innerHTML=html;
+ const phu=rows.filter(r=>r.type==='Phụ').length;
+ $('#thklNote').innerHTML=`<b>${rows.length}</b> dòng · <b>${rows.length-phu}</b> vật tư chính · <b>${phu}</b> vật tư phụ.`+(inserted?' Dòng mới đã được chèn đúng vị trí, sang Bước 2 để đồng bộ.':'');
+ const b=$('#btnIns');if(b)b.onclick=()=>{const i=rows.findIndex(r=>r.id===6);rows.splice(i+1,0,{...INSERT,id:++uid,_new:true});inserted=true;dirty();toast('Đã chèn "Ổ cắm đôi 16A" dưới Aptomat MCB');renderAll();rows.forEach(r=>delete r._new)}}
+
+function renderMap(){
+ $('#mapBody').innerHTML=rows.map(r=>{const [c,l]=STAT[r.status];const p=r.price;
+  const act=r.status==='missing'?`<button class="btn sm pri" data-fix="${r.id}">Bổ sung PRICE</button>`:r.status==='update'?`<button class="btn sm" data-fix="${r.id}">Cập nhật giá mới</button>`:(r.net?'<span class="muted" style="font-size:.78rem">Đã ở NET</span>':'<span class="muted" style="font-size:.78rem">Chờ đồng bộ</span>');
+  return `<tr><td>${r.name}</td><td>${r.brand}</td><td class="r num">${usd(p&&p.nc)}</td><td class="r num">${usd(p&&p.vt)}</td><td><span class="tag ${c}">${l}</span></td><td>${act}</td></tr>`}).join('');
+ $$('[data-fix]').forEach(b=>b.onclick=()=>{const r=rows.find(x=>x.id==b.dataset.fix);const wasMissing=r.status==='missing';r.price={...r.fix};r.status='ready';r.net=false;dirty();toast(wasMissing?`Đã bổ sung PRICE cho ${r.name}`:`Đã cập nhật đơn giá ${r.name}`);renderAll()});
+ const ready=rows.filter(r=>r.status==='ready').length, wait=rows.filter(r=>r.status==='ready'&&!r.net).length, block=rows.length-ready;
+ $('#mapNote').innerHTML=`<b>${ready}/${rows.length}</b> dòng Sẵn sàng. `+(block?`<b>${block}</b> dòng chưa đủ điều kiện sang NET. `:'')+(wait?`<b>${wait}</b> dòng đang chờ đồng bộ.`:'');
+ $('#btnSync').disabled=!wait}
+$('#btnSync').onclick=()=>{let n=0;rows.forEach(r=>{if(r.status==='ready'&&!r.net){r.net=true;n++}});dirty();toast(`Đã đồng bộ ${n} dòng sang NET`);renderAll()};
+
+function renderNet(){const list=netRows().filter(r=>brandFilter==='all'||r.brand===brandFilter);let nc=0,vt=0;
+ $('#netBody').innerHTML=list.map(r=>{const c=calc(r);nc+=c.nc;vt+=c.vt;return `<tr><td>${r.name}${r.type==='Phụ'?' <span class="tag acc">Phụ</span>':''}</td><td>${r.brand}</td><td class="r num">${r.qty.toLocaleString('vi-VN')}</td><td class="r num">${c.ck?(c.ck*100).toFixed(0)+'%':'—'}</td><td class="r num">${vnd(c.nc)}</td><td class="r num">${vnd(c.vt)}</td><td class="r num"><b>${vnd(c.nc+c.vt)}</b></td></tr>`}).join('');
+ $('#netFootLbl').textContent=brandFilter==='all'?`Tổng ${list.length} dòng`:`Tổng hãng ${brandFilter} (${list.length} dòng)`;
+ $('#netNc').textContent=vnd(nc);$('#netVt').textContent=vnd(vt);$('#netSum').textContent=vnd(nc+vt);
+ const brands=[...new Set(netRows().map(r=>r.brand).filter(b=>b!=='—'))];
+ $('#brandF').innerHTML='<option value="all">Tất cả hãng</option>'+brands.map(b=>`<option ${b===brandFilter?'selected':''}>${b}</option>`).join('');
+ const groups=[...new Set(rows.map(r=>r.group))];const g=$('#dGroup').value;
+ $('#dGroup').innerHTML=groups.map(x=>`<option ${x===g?'selected':''}>${x}</option>`).join('');
+ $('#dList').innerHTML=Object.entries(discounts).map(([k,v])=>`<span class="dchip">${k} −${v}%<button data-rm="${k}" aria-label="Bỏ chiết khấu ${k}">×</button></span>`).join('');
+ $$('[data-rm]').forEach(b=>b.onclick=()=>{delete discounts[b.dataset.rm];dirty();renderAll()})}
+$('#dApply').onclick=()=>{const g=$('#dGroup').value,p=Math.max(0,Math.min(50,+$('#dPct').value||0));if(p)discounts[g]=p;else delete discounts[g];dirty();toast(`Chiết khấu ${p}% áp cho toàn bộ nhóm "${g}"`);renderAll()};
+$('#brandF').onchange=e=>{brandFilter=e.target.value;renderNet()};
+INPUTS.forEach(s=>$(s).addEventListener('input',()=>{dirty();renderAll()}));
+
+function renderSum(){const t=totals();
+ $('#sumBody').innerHTML=`
+ <tr><td>Nhân công (sau LNG)</td><td>${vnd(t.nc)}</td></tr>
+ <tr><td>Vật tư (sau chiết khấu, LNG)</td><td>${vnd(t.vt)}</td></tr>
+ <tr><td>Chi phí phụ (Misc) · 3% trên tổng VNĐ sau LNG</td><td>${vnd(t.misc)}</td></tr>
+ <tr><td>Dự phòng theo Hạng mục</td><td>${vnd(t.dp)}</td></tr>
+ <tr class="grand"><td><b>Tổng cộng</b> <span class="muted" style="font-size:.75rem;font-family:var(--f-body)">làm tròn nghìn đồng</span></td><td><b>${vnd(t.total)}</b></td></tr>`;
+ const map={draft:['grey','Nháp'],pending:['warn','Chờ duyệt'],approved:['ok','Đã duyệt'],rejected:['bad','Bị từ chối']};
+ $('#apTag').className='tag '+map[appr][0];$('#apTag').textContent=map[appr][1];
+ $('#apSend').disabled=!(appr==='draft'||appr==='rejected');$('#apSend').textContent=appr==='rejected'?'Gửi duyệt lại':'Gửi duyệt';
+ $('#apOk').disabled=$('#apNo').disabled=appr!=='pending';$('#apExport').disabled=appr!=='approved';
+ $('#apLog').innerHTML=log.slice().reverse().map(([t,m])=>`<li><time>${t}</time><span>${m}</span></li>`).join('')||'<li>Chưa có lịch sử duyệt.</li>';
+ $('#apVer').innerHTML=versions.slice().reverse().map(v=>`<li class="${v.v===curVer?'cur':''}"><span><b>V${v.v}</b> · ${v.time} · ${vnd(v.total)} đ</span>${v.v===curVer?'<span class="tag ok">Đang dùng</span>':`<button class="btn sm" data-ver="${v.v}">Khôi phục</button>`}</li>`).join('')||'<li><span class="muted">Chưa có phiên bản được duyệt.</span></li>';
+ $$('[data-ver]').forEach(b=>b.onclick=()=>restore(+b.dataset.ver))}
+function snapshot(){const t=totals();versions.push({v:versions.length+1,time:now(),total:t.total,rows:JSON.parse(JSON.stringify(rows)),disc:{...discounts},inp:INPUTS.map(s=>$(s).value),inserted});curVer=versions.length}
+function restore(n){const v=versions.find(x=>x.v===n);if(!v)return;
+ rows.splice(0,rows.length,...JSON.parse(JSON.stringify(v.rows)));Object.keys(discounts).forEach(k=>delete discounts[k]);Object.assign(discounts,v.disc);
+ INPUTS.forEach((s,i)=>$(s).value=v.inp[i]);inserted=v.inserted;appr='approved';curVer=n;log.push([now(),`Khôi phục phiên bản đã duyệt V${n}`]);toast(`Đã khôi phục phiên bản V${n}`);renderAll()}
+const now=()=>new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function act(s,m){appr=s;log.push([now(),m]);renderAll()}
+$('#apSend').onclick=()=>act('pending',appr==='rejected'?'Gửi duyệt lại':'Gửi duyệt · '+vnd(totals().total)+' đ');
+$('#apOk').onclick=()=>{snapshot();act('approved',`Đã phê duyệt · lưu phiên bản V${curVer}`)};
+$('#apNo').onclick=()=>act('rejected','Từ chối · yêu cầu xem lại chiết khấu');
+$('#apExport').onclick=()=>{log.push([now(),'Xuất báo giá theo '+$('#tpl').value]);toast(`Đã xuất báo giá theo ${$('#tpl').value} (minh họa)`);renderAll()};
+function dirty(){curVer=null;if(appr==='approved'||appr==='pending'){appr='draft';log.push([now(),'Số liệu thay đổi → quay về Nháp']);toast('Số liệu đã đổi, báo giá cần gửi duyệt lại')}}
+
+function renderStrip(){const t=totals();$('#sRows').textContent=rows.length;$('#sNet').textContent=`${netRows().length}/${rows.length}`;
+ $('#sTotal').textContent=vnd(t.total)+' đ';$('#sStatus').textContent={draft:'Nháp',pending:'Chờ duyệt',approved:'Đã duyệt',rejected:'Bị từ chối'}[appr]}
+function renderAll(){renderThkl();renderMap();renderNet();renderSum();renderStrip()}
+
+function goStep(i){$$('.step').forEach(s=>s.setAttribute('aria-selected',+s.dataset.step===i));$$('[data-pane]').forEach(p=>p.hidden=+p.dataset.pane!==i)}
+$$('.step').forEach(s=>s.onclick=()=>goStep(+s.dataset.step));
+$$('[data-tf]').forEach(c=>c.onclick=()=>{tFilter=c.dataset.tf;$$('[data-tf]').forEach(x=>x.setAttribute('aria-pressed',x===c));renderThkl()});
+renderAll();
+
+/* ---------- Phạm vi ---------- */
+const PAY=[
+ ["F01",15,39750000,"Nền tảng Dự án + SOW/Danh mục vật tư","SOW, Danh mục yêu cầu, phạm vi dữ liệu Dự án, SOW/Danh mục vật tư và các nội dung cần xác nhận được ghi nhận"],
+ ["F02",20,53000000,"PRICE dùng chung + Ánh xạ PRICE theo Dự án","Nghiệm thu F01/F02; ánh xạ/đối chiếu theo Dự án hoạt động đúng theo luồng cập nhật"],
+ ["F03",20,53000000,"THKL + Nhập vật tư phụ","Nghiệm thu THKL-first, nhập Loại/Nhóm vật tư, chèn/sắp xếp lại và xử lý vật tư Thiếu PRICE qua màn hình Ánh xạ"],
+ ["F04",25,66250000,"NET & Bộ máy tính giá","Nghiệm thu tích hợp F04/F05 trên bộ dữ liệu đại diện ở quy mô vận hành thực tế"],
+ ["F05",10,26500000,"Quy tắc tính giá sẵn sàng","Nghiệm thu LNG/Tỷ giá/Chiết khấu/Hệ số; CXN-01 được rà soát và chốt"],
+ ["F06",10,26500000,"Tổng hợp, Phê duyệt, Báo giá & Vận hành chính thức","CXN-02 được chốt; UAT đầu-cuối, 03 mẫu báo giá, triển khai, đào tạo và bàn giao"]
+];
+const F=[
+ ["F01","Quản lý dự án & Nền tảng ứng dụng","Phạm vi dữ liệu Dự án, tách biệt dữ liệu, Tỷ giá, trạng thái Dự án, SOW, Danh mục vật tư, phân quyền cơ bản",
+  ["Tạo/quản lý Dự án với Mã Dự án duy nhất; chọn/chuyển Dự án và giữ đúng phạm vi dữ liệu xuyên suốt THKL, Ánh xạ PRICE, NET, Quy tắc tính giá, Tổng hợp và Phê duyệt.",
+   "Thiết lập Tỷ giá USD/VND theo Dự án; quản lý trạng thái Dự án cơ bản.",
+   "Màn hình SOW và Danh mục vật tư theo Dự án (Material List): nhập/hiển thị/chỉnh sửa theo cấu trúc đã chốt, không có logic tính toán riêng trong V1.",
+   "Tách biệt dữ liệu giữa các Dự án; phân quyền cơ bản theo nhóm người dùng/vai trò.",
+   "Hoàn thiện vận hành: bỏ các giá trị Dự án/Mẫu báo giá gắn cứng từ POC; chuẩn hóa điều hướng, trạng thái ứng dụng và cấu hình theo từng Môi trường."],
+  "Tạo/mở Dự án không trùng mã; chuyển Dự án không lẫn dữ liệu; Tỷ giá đúng theo Dự án; SOW/Danh mục vật tư hiển thị đúng phạm vi Dự án; không còn lỗi mức Nghiêm trọng/Cao.",null],
+ ["F02","Quản lý PRICE","Danh mục PRICE dùng chung, Ánh xạ/đối chiếu PRICE theo Dự án, Nhập dữ liệu, Thêm/Sửa/Xóa, Nhóm vật tư, Lọc/Tìm kiếm",
+  ["Danh mục PRICE dùng chung quản lý các trường chuẩn: Mã vật tư, Tên vật tư, Hãng, Nhóm vật tư, Đơn vị, Trang tính nguồn, Đơn giá Nhân công/Vật tư, LNG mặc định, trạng thái Hoạt động/Ngừng sử dụng và thông tin quản trị.",
+   "Nhập/Cập nhật từ Excel có kiểm tra dữ liệu, cơ chế thử lại và chống xử lý trùng; Thêm/Sửa thủ công dùng cùng cấu trúc dữ liệu với luồng nhập Excel.",
+   "Tách 02 màn hình: Danh mục PRICE dùng chung (toàn bộ thư viện) và Ánh xạ PRICE theo Dự án (chỉ vật tư phát sinh từ THKL/NET của Dự án, không hiển thị toàn bộ thư viện theo mặc định).",
+   "Đối chiếu theo trạng thái Đã khớp / Thiếu PRICE / Cần cập nhật / Sẵn sàng; vật tư chưa hoàn tất ánh xạ không được chuyển sang NET.",
+   "Ngừng sử dụng/Xóa mềm; Lọc theo Hãng/Nhóm vật tư; Tìm theo Mã/Tên vật tư (theo ký tự bất kỳ), tuân thủ giới hạn ủy quyền truy vấn của Power Platform."],
+  "Nhập dữ liệu chính xác; kiểm tra dữ liệu bắt đúng lỗi; Dự án chỉ thấy tập vật tư liên quan; đối chiếu không làm mất THKL; chỉ vật tư Sẵn sàng mới đi tiếp sang NET; không còn lỗi mức Nghiêm trọng/Cao.",null],
+ ["F03","Quản lý THKL","Nhập THKL trước, cấu trúc phân cấp, Số lượng, vật tư chính/phụ, Loại/Nhóm vật tư, lọc/thống kê vật tư phụ, chèn/sắp xếp lại, xóa mềm",
+  ["Nhập THKL từ cùng một file Excel theo Gói công việc/Hạng mục/Tiểu hạng mục/Dòng/Số lượng; vật tư chính và phụ phân loại bằng Loại/Nhóm vật tư; cho phép lặp vật tư theo quy tắc nghiệp vụ; lọc và thống kê riêng vật tư phụ theo cấu trúc THKL.",
+   "Thêm/chèn vật tư tại vị trí bất kỳ; thứ tự sắp xếp ổn định và điều chỉnh được; Xóa mềm; tiếp tục chỉnh sửa sau khi nhập.",
+   "Gói công việc linh hoạt, không gắn cứng giới hạn 4 gói.",
+   "Vật tư thiếu PRICE được giữ trong THKL và chuyển sang Ánh xạ PRICE theo Dự án để đối chiếu, không yêu cầu nhập lại THKL."],
+  "Theo mốc thanh toán F03 (xem bảng 7.2).",
+  "<b>Đã xác nhận</b> · THKL → Ánh xạ/đối chiếu PRICE theo Dự án → NET. Vật tư thiếu PRICE ở trạng thái Chờ xử lý/Thiếu PRICE, chỉ đủ điều kiện sang NET sau khi hoàn tất đối chiếu với PRICE dùng chung."],
+ ["F04","NET & Tính giá","Đồng bộ THKL→NET, nguồn giá đã ánh xạ, tính toán, phân tích theo Hãng, hiển thị giá theo từng dòng",
+  ["Đồng bộ các dòng THKL đang hoạt động/đủ điều kiện sang NET C/M/E/INDIRECT; ánh xạ đúng phân hệ NET đích và đúng nguồn giá từ Ánh xạ PRICE theo Dự án/PRICE dùng chung.",
+   "Quản lý Số lượng, Đơn giá và Thành tiền Nhân công/Vật tư, giá trị USD/VND; xử lý vật tư mới, cập nhật số lượng, ngừng sử dụng, xóa, trùng lặp; người dùng vẫn thấy giá riêng lẻ theo từng vật tư.",
+   "Phân tích theo Hãng: lọc theo Hãng, tổng Nhân công/Vật tư/Tổng giá trị trên toàn bộ tập dữ liệu, không chỉ các dòng đã tải về ứng dụng.",
+   "Tính giá ưu tiên tham chiếu Quy tắc tính giá và dữ liệu tổng hợp, thay vì ghi lại Giá cuối cho hàng nghìn dòng NET mỗi khi chỉ đổi LNG, tỷ giá hoặc hệ số; Tổng hợp dùng cùng nguồn dữ liệu chuẩn để tránh sai tổng tiền."],
+  "Theo mốc thanh toán F04 (xem bảng 7.2).",null],
+ ["F05","LNG, Tỷ giá & Quy tắc tính giá","LNG Nhân công/Vật tư, Chiết khấu theo nhóm, hệ số vật tư phụ/dự phòng, quy tắc tính lại/tổng hợp",
+  ["Tỷ giá quản lý theo Dự án; LNG theo Dự án, tách hệ số Nhân công và Vật tư; quy tắc có phạm vi áp dụng rõ ràng và truy vết được.",
+   "Chiết khấu hàng loạt theo Nhóm vật tư, thiết lập một lần cho cả nhóm; tính lại/tổng hợp dùng quy tắc mới mà không phải thao tác lại từng dòng.",
+   "Màn hình riêng cho Quy tắc tính giá/Hệ số dự phòng; tạm quản lý hệ số dự phòng ở cấp Hạng mục (Section). Công thức và cơ sở tính: <span class=\"tag warn\">CXN-01</span>, rà soát trước khi chốt F05.",
+   "Vật tư phụ dùng Loại/Nhóm vật tư đã chuẩn hóa từ THKL để phân loại, thống kê và áp quy tắc; công thức hệ số vật tư phụ xác nhận ở thiết kế chi tiết nếu khác logic hiện tại.",
+   "Ưu tiên Quy tắc tính giá theo Dự án, xử lý tổng hợp phía máy chủ và dữ liệu tham chiếu; tránh cập nhật hàng loạt từng vật tư từ Power Apps khi chỉ đổi quy tắc."],
+  "Theo mốc thanh toán F05 (xem bảng 7.2).",null],
+ ["F06","Tổng hợp, Phê duyệt & Xuất báo giá","Tổng hợp, Quy trình phê duyệt, làm tròn, Gói công việc linh hoạt, 03 mẫu báo giá tùy chỉnh, phát hành",
+  ["Tổng hợp theo Gói công việc: Tạm tính, Tổng, Tổng cộng và làm tròn theo quy tắc nghiệp vụ/file Excel tham chiếu; dùng cùng Quy tắc tính giá và nguồn dữ liệu chuẩn với NET.",
+   "Tối đa 03 mẫu báo giá tùy chỉnh, NSN xác nhận trước khi chốt F06; từ mẫu thứ 4 xử lý theo CR.",
+   "Quy trình phê duyệt kích hoạt sau khi hoàn thiện báo giá lần 1; trạng thái Gửi duyệt / Phê duyệt / Từ chối / Gửi duyệt lại; lưu thông tin phục vụ trình duyệt/phát hành.",
+   "<span class=\"tag warn\">CXN-02</span> Số cấp duyệt, ma trận người phê duyệt, nguồn xác định người duyệt, điều kiện duyệt và cách xử lý phiên bản sau Từ chối/Gửi duyệt lại: rà soát sau vòng hoàn thiện đầu tiên, trước khi chốt F06.",
+   "Xuất Excel giữ định dạng và công thức/liên kết; đính kèm tài liệu và gửi báo giá/email theo quy trình thống nhất sau khi đạt trạng thái phê duyệt đã cấu hình."],
+  "Theo mốc thanh toán F06 (xem bảng 7.2).",null]
+];
+const vndM=n=>(n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:2});
+$('#fgrid').innerHTML=F.map((f,i)=>{const p=PAY[i];const acc=f[4].startsWith('Theo mốc')?p[4]:f[4];
+ return `<button class="fcard" aria-expanded="false"><div class="fh"><span class="fid">${f[0]}</span><span class="tag blue">${p[1]}% · ${vndM(p[2])} tr</span></div><h3>${f[1]}</h3><div class="sum">${f[2]}</div><div class="more"><h4>Phạm vi</h4><ul>${f[3].map(x=>`<li>${x}</li>`).join('')}</ul>${f[5]?`<div class="fstatus">${f[5]}</div>`:''}<h4>${f[4].startsWith('Theo mốc')?'Điều kiện nghiệm thu mốc':'Tiêu chí nghiệm thu trọng tâm'}</h4><div class="acc">✓ ${acc}</div><div class="deliv">Bàn giao mốc: ${p[3]}</div></div><span class="hint">Bấm để xem chi tiết</span></button>`}).join('');
+const setCard=(c,o)=>{c.setAttribute('aria-expanded',o);c.querySelector('.hint').textContent=o?'Bấm để thu gọn':'Bấm để xem chi tiết'};
+$$('.fcard').forEach(c=>c.onclick=e=>{if(e.target.closest('a'))return;setCard(c,c.getAttribute('aria-expanded')!=='true');syncAll()});
+const syncAll=()=>{const all=$$('.fcard').every(c=>c.getAttribute('aria-expanded')==='true');$('#fAll').textContent=all?'Thu gọn tất cả':'Mở tất cả'};
+$('#fAll').onclick=()=>{const open=$('#fAll').textContent==='Mở tất cả';$$('.fcard').forEach(c=>setCard(c,open));syncAll()};
+
+/* ---------- Thanh toán ---------- */
+const PC=['var(--blue)','#3D6FB0','#5B8BC9','var(--accent)','#8A6B3E','var(--ok)'];
+$('#paybar').innerHTML=PAY.map((p,i)=>`<div style="flex:${p[1]};background:${PC[i]}" title="${p[0]}: ${vndM(p[2])} triệu">${p[1]}%</div>`).join('');
+$('#paylegend').innerHTML=PAY.map((p,i)=>`<div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${PC[i]};margin-right:4px"></span>${p[0]}<b>${vndM(p[2])} tr</b></div>`).join('');
+$('#payTbl').innerHTML=PAY.map((p,i)=>`<tr><td><span class="tag blue">${p[0]}</span></td><td class="r num">${p[1]}%</td><td class="r num">${p[2].toLocaleString('vi-VN')}</td><td>${p[3]}</td><td>${p[4]}</td></tr>`).join('');
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const stage=document.getElementById('stage3d');
+if(!window.THREE){document.getElementById('fb3d').hidden=false;document.querySelector('.cap3d').hidden=true;return}
+const T=THREE, reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas=document.getElementById('c3d');
+const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const scene=new T.Scene();
+const cam=new T.PerspectiveCamera(42,1,.1,100);
+scene.add(new T.HemisphereLight(0xdfe8ff,0x16202e,.95));
+const sun=new T.DirectionalLight(0xffffff,.75);sun.position.set(5,10,7);scene.add(sun);
+const grid=new T.GridHelper(40,40,0x2A3E5A,0x18273B);grid.position.y=-2.1;scene.add(grid);
+const V=(x,y,z)=>new T.Vector3(x,y,z);
+const mat=(c,em)=>new T.MeshStandardMaterial({color:c,transparent:true,opacity:0,roughness:.5,metalness:.08,emissive:em||0x000000,emissiveIntensity:0});
+
+/* ---- textures ---- */
+function sheetTex(hex,title){const c=document.createElement('canvas');c.width=256;c.height=180;const g=c.getContext('2d');
+ g.fillStyle='#F7F9FB';g.fillRect(0,0,256,180);g.fillStyle=hex;g.fillRect(0,0,256,34);
+ g.fillStyle='#fff';g.font='bold 18px system-ui,sans-serif';g.fillText(title,12,23);
+ g.strokeStyle='#C9D3DE';g.lineWidth=1;for(let y=52;y<180;y+=18){g.beginPath();g.moveTo(0,y);g.lineTo(256,y);g.stroke()}
+ for(let x=60;x<256;x+=52){g.beginPath();g.moveTo(x,34);g.lineTo(x,180);g.stroke()}
+ g.fillStyle=hex+'55';for(let i=0;i<7;i++){g.fillRect(60+((i*3)%4)*52+2,54+((i*5)%7)*18,48,14)}
+ g.fillStyle='#E5534B';g.fillRect(164,108,48,14);
+ const t=new T.CanvasTexture(c);t.anisotropy=4;return t}
+function quoteTex(){const c=document.createElement('canvas');c.width=256;c.height=330;const g=c.getContext('2d');
+ g.fillStyle='#FFFFFF';g.fillRect(0,0,256,330);g.fillStyle='#13233A';g.fillRect(0,0,256,54);
+ g.fillStyle='#fff';g.font='bold 22px system-ui,sans-serif';g.fillText('BÁO GIÁ',18,35);
+ g.fillStyle='#13233A';g.font='14px system-ui,sans-serif';g.fillText('DA-2026-014 · M&E – Điện',18,80);g.fillText('Mẫu 1',18,100);
+ g.strokeStyle='#D6DDE6';for(let y=122;y<250;y+=20){g.beginPath();g.moveTo(18,y);g.lineTo(238,y);g.stroke()}
+ g.fillStyle='#C26F12';g.font='bold 16px system-ui,sans-serif';g.fillText('Tổng cộng',18,276);
+ g.strokeStyle='#1C7A4B';g.lineWidth=4;g.strokeRect(150,284,90,32);g.fillStyle='#1C7A4B';g.font='bold 15px system-ui,sans-serif';g.fillText('ĐÃ DUYỆT',158,306);
+ return new T.CanvasTexture(c)}
+
+/* ---- labels ---- */
+const labelsEl=document.getElementById('labels3d');const labels=[];
+function label(obj,text,off,cls,when,short){const d=document.createElement('div');d.className='lb3d'+(cls?' '+cls:'');d.textContent=text;labelsEl.appendChild(d);labels.push({obj,off:V(...off),el:d,when,text,short:short||text,cur:text});}
+
+/* ---- items with per-scene targets ---- */
+const items=[];
+function item(mesh,targets,extra){mesh.material.opacity=0;scene.add(mesh);const it=Object.assign({mesh,targets},extra||{});items.push(it);
+ const t0=targets[0];mesh.position.copy(t0.p);mesh.scale.copy(t0.s);return it}
+const S=(x,y,z)=>V(x,y,z);
+
+/* scene 0: sheets */
+const KINDS=[['#2E9D5B','PRICE'],['#3E7BC4','THKL'],['#D08A2E','NET'],['#4E9F99','TỔNG HỢP']];
+const texs=KINDS.map(k=>sheetTex(k[0],k[1]));
+const geoSheet=new T.BoxGeometry(1.15,.8,.03);
+const sheets=[];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+for(let i=0;i<16;i++){const k=i%4;const m=new T.Mesh(geoSheet,new T.MeshStandardMaterial({map:texs[k],transparent:true,opacity:0,roughness:.6}));
+ const a=i/16*Math.PI*2, r=rnd(2.2,4.6);
+ const p0=V(Math.cos(a)*r,rnd(-1,2.6),Math.sin(a)*r*.6);
+ const p1=V(rnd(-1.8,1.8),.95,rnd(-1,1));
+ const it=item(m,[{p:p0,s:S(1,1,1),o:.97},{p:p1,s:S(.25,.25,.25),o:0},{p:p1,s:S(.2,.2,.2),o:0}],{spin:V(rnd(-.6,.6),rnd(-.8,.8),rnd(-.4,.4)),bob:rnd(0,6)});
+ m.rotation.set(rnd(-.5,.5),rnd(-1,1),rnd(-.3,.3));sheets.push(it)}
+const FILES=['PRICE_v3_final.xlsx','THKL_DA14 (2).xlsx','NET_sua_lan4.xlsx','TongHop_cu.xlsx'];
+FILES.forEach((f,i)=>label(sheets[i].mesh,f,[0,.62,0]));
+label(sheets[5].mesh,'Ai vừa sửa đơn giá?',[0,.62,0],'warn');
+label(sheets[10].mesh,'Lệch số giữa 2 file',[0,.62,0],'warn');
+/* warning links */
+const PAIRS=[[0,5],[5,10],[2,7],[7,12],[3,9],[1,14],[9,15]];
+const lineGeo=new T.BufferGeometry();lineGeo.setAttribute('position',new T.BufferAttribute(new Float32Array(PAIRS.length*6),3));
+const lineMat=new T.LineBasicMaterial({color:0xE5534B,transparent:true,opacity:0});const links=new T.LineSegments(lineGeo,lineMat);scene.add(links);
+
+/* scene 1: architecture layers */
+const LAYERS=[['Power Apps · Giao diện',0x3E7BC4],['Power Automate · Xử lý',0xD08A2E],['SharePoint · Dữ liệu',0x2E9D5B],['Excel + Office Scripts · Nhập/Xuất',0x4E9F99],['Entra ID · Đăng nhập & quyền',0x7D8FA6]];
+const geoLayer=new T.BoxGeometry(5.2,.32,3.2);const layers=[];
+LAYERS.forEach((L,i)=>{const y1=2.5-i*.86;const m=new T.Mesh(geoLayer,mat(L[1],L[1]));
+ const it=item(m,[{p:V(0,y1-3.5,0),s:S(.6,1,.6),o:0},{p:V(0,y1,0),s:S(1,1,1),o:.92},{p:V(0,-1.75,-.2),s:S(2.75,.5,1.45),o:0}]);
+ layers.push(it);label(m,L[0],[2.6,.3,1.6],'big',()=>cur===1)});
+
+/* scene 2: stations + track */
+const base=new T.Mesh(new T.BoxGeometry(14.4,.16,4.8),mat(0x1B3150,0x3E7BC4));base.material.emissiveIntensity=.12;
+item(base,[{p:V(0,-3.5,-.2),s:S(.4,1,.4),o:0},{p:V(0,-3.5,-.2),s:S(.4,1,.4),o:0},{p:V(0,-1.55,-.2),s:S(1,1,1),o:.95}]);
+label(base,'Nền tảng Power Platform',[-5.2,.1,2.3],'',()=>cur===2&&stage.clientWidth>=600);
+const ST=['THKL','Ánh xạ PRICE','NET','Quy tắc giá','Tổng hợp','Phê duyệt','Báo giá'];
+const FC=['F03','F02','F04','F05','F06','F06','F06'];
+const sp=ST.map((_,i)=>V(-6+i*2,-1.1,-Math.sin(i/6*Math.PI)*1.6+.6));
+const geoSt=new T.BoxGeometry(1.15,.7,1.15);const stations=[];
+sp.forEach((p,i)=>{const m=new T.Mesh(geoSt,mat(0x24405F,i===5?0x4CC38A:0xEB9C3E));
+ const it=item(m,[{p:V(p.x,-4,p.z),s:S(1,1,1),o:0},{p:V(p.x,-4,p.z),s:S(1,1,1),o:0},{p:p.clone(),s:S(1,1,1),o:1}]);
+ stations.push(it);label(m,`${i+1} · ${ST[i]} · ${FC[i]}`,[0,-.75,.7],'',()=>cur===2,`${i+1}`)});
+const curve=new T.CatmullRomCurve3(sp.map(p=>V(p.x,p.y+.55,p.z)));
+const tube=new T.Mesh(new T.TubeGeometry(curve,120,.045,8,false),mat(0x86B4F0,0x86B4F0));tube.material.emissiveIntensity=.5;
+const tubeIt=item(tube,[{p:V(0,0,0),s:S(1,1,1),o:0},{p:V(0,0,0),s:S(1,1,1),o:0},{p:V(0,0,0),s:S(1,1,1),o:.8}]);
+/* PRICE dùng chung */
+const db=new T.Mesh(new T.CylinderGeometry(.5,.5,.85,32),mat(0x2E9D5B,0x2E9D5B));
+const dbP=V(sp[1].x,.9,sp[1].z-2.1);
+item(db,[{p:V(dbP.x,4,dbP.z),s:S(1,1,1),o:0},{p:V(dbP.x,4,dbP.z),s:S(1,1,1),o:0},{p:dbP,s:S(1,1,1),o:.95}]);
+label(db,'PRICE dùng chung',[0,.7,0],'big',()=>cur===2);
+const beamCurve=new T.LineCurve3(dbP.clone().add(V(0,-.42,0)),V(sp[1].x,sp[1].y+.36,sp[1].z));
+const beam=new T.Mesh(new T.TubeGeometry(beamCurve,8,.025,6,false),mat(0x5BC88E,0x5BC88E));beam.material.emissiveIntensity=.8;
+item(beam,[{p:V(0,0,0),s:S(1,1,1),o:0},{p:V(0,0,0),s:S(1,1,1),o:0},{p:V(0,0,0),s:S(1,1,1),o:.7}]);
+/* quote doc */
+const quote=new T.Mesh(new T.BoxGeometry(1.05,1.35,.03),new T.MeshStandardMaterial({map:quoteTex(),transparent:true,opacity:0,roughness:.5}));
+const qP=V(sp[6].x,.75,sp[6].z);
+const quoteIt=item(quote,[{p:V(qP.x,-3,qP.z),s:S(1,1,1),o:0},{p:V(qP.x,-3,qP.z),s:S(1,1,1),o:0},{p:qP,s:S(1,1,1),o:1}]);
+/* packets */
+const pk=[];const geoPk=new T.BoxGeometry(.3,.3,.3);
+for(let i=0;i<7;i++){const special=i===0;const m=new T.Mesh(geoPk,mat(special?0xE5534B:0x86B4F0,special?0xE5534B:0x86B4F0));m.material.emissiveIntensity=.35;scene.add(m);
+ pk.push({m,u:-i*1.05,special,fixed:false,hold:0})}
+label(pk[0].m,'Thiếu PRICE → đang bổ sung',[0,.45,0],'warn',()=>cur===2&&pk[0].u>=.98&&!pk[0].fixed&&pk[0].u<1.1);
+label(pk[0].m,'Đã đủ PRICE → sang NET',[0,.45,0],'ok',()=>cur===2&&pk[0].fixed&&pk[0].u<2.2);
+
+/* ---- scenes ---- */
+const CAPS=[
+ ['Hiện tại: báo giá nằm trên nhiều file Excel','PRICE, THKL, NET, Tổng hợp rời rạc. Đồng bộ bằng tay, khó truy vết, dễ ghi đè.'],
+ ['Hợp nhất trên Microsoft Power Platform','Toàn bộ file được gom về một nguồn dữ liệu. 5 tầng: Giao diện, Xử lý, Dữ liệu, Nhập/Xuất, Đăng nhập & quyền.'],
+ ['Dữ liệu chạy qua luồng V1','1 THKL → 2 Ánh xạ PRICE → 3 NET → 4 Quy tắc giá → 5 Tổng hợp → 6 Phê duyệt → 7 Báo giá. Khối xanh là từng dòng vật tư. Khối đỏ thiếu PRICE phải dừng ở Ánh xạ, bổ sung xong mới đi tiếp.']];
+const CAMS=[[V(0,1.4,10.5),V(0,.5,0)],[V(6.8,4.6,7.6),V(0,.7,0)],[V(0,5.6,9.6),V(0,-.9,-.2)]];
+const DUR=[7,8,14];
+let cur=0, playing=!reduce, tScene=0, arrivals=0, yaw=0, dragging=false;
+const camPos=CAMS[0][0].clone(), look=CAMS[0][1].clone();
+function setScene(i,manual){cur=i;tScene=0;
+ document.querySelectorAll('[data-scene]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.scene===i));
+ document.getElementById('capNo').textContent=`Cảnh ${i+1}/3`;document.getElementById('capTitle').textContent=CAPS[i][0];document.getElementById('capText').textContent=CAPS[i][1];
+ document.getElementById('hud3d').hidden=i!==2;
+ if(i===2){pk.forEach((p,j)=>{p.u=-j*1.05;p.fixed=false;p.hold=0})}
+ if(manual)yaw=0}
+document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>setScene(+b.dataset.scene,true));
+const playBtn=document.getElementById('play3d');
+const syncPlay=()=>playBtn.textContent=playing?'❚❚ Tạm dừng':'▶ Tự chạy';syncPlay();
+playBtn.onclick=()=>{playing=!playing;syncPlay()};
+
+/* drag to orbit */
+let lx=0;stage.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;stage.classList.add('drag');stage.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointermove',e=>{if(!dragging)return;yaw+=(e.clientX-lx)*.008;yaw=Math.max(-1.3,Math.min(1.3,yaw));lx=e.clientX});
+const endDrag=()=>{dragging=false;stage.classList.remove('drag')};stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
+
+/* size */
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(stage);resize();
+
+/* visibility */
+let visible=true;new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible)last=performance.now()}).observe(stage);
+
+/* ---- loop ---- */
+const tmp=V(0,0,0), tmp2=V(0,0,0);const C_BLUE=new T.Color(0x86B4F0),C_RED=new T.Color(0xE5534B),C_GREEN=new T.Color(0x4CC38A);
+let last=performance.now(), clock=0;
+function frame(now){requestAnimationFrame(frame);if(!visible||document.hidden){last=now;return}
+ const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
+ const k=reduce?1:1-Math.pow(.02,dt);
+ if(playing){tScene+=dt;if(tScene>DUR[cur])setScene((cur+1)%3)}
+ document.getElementById('prog3d').style.width=(playing?Math.min(1,tScene/DUR[cur])*100:0)+'%';
+ /* items */
+ items.forEach(it=>{const tg=it.targets[cur];it.mesh.position.lerp(tg.p,k);it.mesh.scale.lerp(tg.s,k);it.mesh.material.opacity+=(tg.o-it.mesh.material.opacity)*k;it.mesh.visible=it.mesh.material.opacity>.02});
+ sheets.forEach(s=>{const m=s.mesh;if(cur===0&&!reduce){m.rotation.x+=s.spin.x*dt*.5;m.rotation.y+=s.spin.y*dt;m.rotation.z+=s.spin.z*dt*.5;m.position.y+=Math.sin(clock*1.2+s.bob)*.004}
+  else if(cur!==0){m.rotation.x+=(-Math.PI/2-m.rotation.x)*k*.6}});
+ /* links */
+ const arr=lineGeo.attributes.position.array;PAIRS.forEach(([a,b],i)=>{const pa=sheets[a].mesh.position,pb=sheets[b].mesh.position;arr.set([pa.x,pa.y,pa.z,pb.x,pb.y,pb.z],i*6)});lineGeo.attributes.position.needsUpdate=true;
+ lineMat.opacity+=(((cur===0)?(.35+.35*Math.sin(clock*5)):0)-lineMat.opacity)*k;links.visible=lineMat.opacity>.02;
+ /* layers in scene 1: gentle breathing */
+ if(cur===1&&!reduce)layers.forEach((l,i)=>{l.mesh.position.y+=Math.sin(clock*1.5+i)*.003});
+ layers.forEach(l=>{l.mesh.material.emissiveIntensity=cur===1?.18:.05});
+ /* packets */
+ const pkOn=cur===2;
+ pk.forEach((p,i)=>{
+  if(pkOn&&!reduce){
+   if(p.special&&!p.fixed&&p.u>=1&&p.u<1.1){p.hold+=dt;if(p.hold>1.8){p.fixed=true}}
+   else{p.u+=dt*.8;if(p.u>6){p.u-=7.35;arrivals++;quote.scale.setScalar(1.18);document.getElementById('hudN').textContent=arrivals;if(p.special){p.fixed=false;p.hold=0}}}
+  } else if(pkOn&&reduce){p.u=Math.max(0,6-i*.9)}
+  const u=Math.max(0,Math.min(6,p.u));curve.getPoint(u/6,tmp);p.m.position.copy(tmp);
+  p.m.rotation.y+=dt*1.6;p.m.rotation.x+=dt*.8;
+  const target=pkOn&&p.u>=0?1:0;p.m.material.opacity+=(target-p.m.material.opacity)*k;p.m.visible=p.m.material.opacity>.02;
+  const col=p.special&&!p.fixed?C_RED:(p.special?C_GREEN:C_BLUE);p.m.material.color.lerp(col,k);p.m.material.emissive.lerp(col,k)});
+ /* station pulse */
+ stations.forEach((s,i)=>{const near=pkOn&&pk.some(p=>Math.abs(p.u-i)<.22);s.mesh.material.emissiveIntensity+=((near?.75:.08)-s.mesh.material.emissiveIntensity)*Math.min(1,dt*8)});
+ /* quote bob */
+ if(cur===2){quote.rotation.y=Math.sin(clock*.8)*.35;quote.position.y=quoteIt.targets[2].p.y+Math.sin(clock*1.6)*.07;quote.scale.lerp(V(1,1,1),Math.min(1,dt*4))}
+ /* camera */
+ if(cur===1&&!dragging&&!reduce)yaw+=dt*.12;
+ if(cur!==1&&!dragging)yaw+=(0-yaw)*Math.min(1,dt*.8);
+ const [cp,cl]=CAMS[cur];const fit=Math.max(1,(cur===2?1.3:1.5)/cam.aspect);
+ tmp.copy(cp).sub(cl).multiplyScalar(fit);tmp.applyAxisAngle(V(0,1,0),yaw);tmp.add(cl);
+ camPos.lerp(tmp,reduce?1:1-Math.pow(.15,dt));look.lerp(cl,reduce?1:1-Math.pow(.15,dt));cam.position.copy(camPos);cam.lookAt(look);
+ renderer.render(scene,cam);
+ /* labels */
+ const w=stage.clientWidth,h=stage.clientHeight;
+ const narrow=w<600;labels.forEach(L=>{const o=L.obj;const want=narrow?L.short:L.text;if(L.cur!==want){L.el.textContent=want;L.cur=want}let show=o.visible&&o.material.opacity>.55&&(!L.when||L.when());
+  if(show){tmp2.copy(L.off);o.getWorldPosition(tmp);tmp.add(tmp2);tmp.project(cam);if(tmp.z>1)show=false;
+   const x=(tmp.x*.5+.5)*w,y=(-tmp.y*.5+.5)*h;L.el.style.transform=`translate(${x}px,${y}px) translate(-50%,-100%)`}
+  L.el.style.opacity=show?1:0})}
+setScene(0);requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
